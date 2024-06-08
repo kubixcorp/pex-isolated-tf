@@ -10,11 +10,13 @@ terraform {
 provider "aws" {
   alias  = "virginia"
   region = "us-east-1"
+  profile = "fmoralesIsolated"
 }
 
 provider "aws" {
   alias  = "oregon"
   region = "us-west-2"
+  profile = "fmoralesIsolated"
 }
 
 module "vpc_virginia" {
