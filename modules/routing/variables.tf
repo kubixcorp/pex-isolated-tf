@@ -1,7 +1,9 @@
+
 variable "region" {
   description = "AWS region"
   type        = string
 }
+
 variable "transit_gateway_id" {
   description = "The ID of the Transit Gateway"
   type        = string
