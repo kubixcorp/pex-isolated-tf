@@ -12,7 +12,7 @@ provider "aws" {
 }
 
 resource "aws_vpc" "main" {
-  provider = aws.current
+  provider   = aws.current
   cidr_block = var.vpc_cidr
   tags = {
     Name = "main-vpc"
@@ -20,10 +20,10 @@ resource "aws_vpc" "main" {
 }
 
 resource "aws_subnet" "public" {
-  provider = aws.current
-  count = length(var.public_subnet_cidrs)
-  vpc_id = aws_vpc.main.id
-  cidr_block = element(var.public_subnet_cidrs, count.index)
+  provider          = aws.current
+  count             = length(var.public_subnet_cidrs)
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = element(var.public_subnet_cidrs, count.index)
   availability_zone = element(var.availability_zones, count.index)
   tags = {
     Name = "public-subnet-${count.index}"
@@ -31,10 +31,10 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_subnet" "private" {
-  provider = aws.current
-  count = length(var.private_subnet_cidrs)
-  vpc_id = aws_vpc.main.id
-  cidr_block = element(var.private_subnet_cidrs, count.index)
+  provider          = aws.current
+  count             = length(var.private_subnet_cidrs)
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = element(var.private_subnet_cidrs, count.index)
   availability_zone = element(var.availability_zones, count.index)
   tags = {
     Name = "private-subnet-${count.index}"

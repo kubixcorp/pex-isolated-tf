@@ -47,7 +47,7 @@ module "vpc_oregon" {
 
 # Crear los Transit Gateways después de los VPCs y Subnets
 resource "aws_ec2_transit_gateway" "virginia" {
-  provider = aws.virginia
+  provider    = aws.virginia
   description = "Transit Gateway for Virginia region"
   tags = {
     Name = "transit-gateway-virginia"
@@ -55,7 +55,7 @@ resource "aws_ec2_transit_gateway" "virginia" {
 }
 
 resource "aws_ec2_transit_gateway" "oregon" {
-  provider = aws.oregon
+  provider    = aws.oregon
   description = "Transit Gateway for Oregon region"
   tags = {
     Name = "transit-gateway-oregon"
