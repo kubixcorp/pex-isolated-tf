@@ -7,16 +7,16 @@ terraform {
 }
 
 provider "aws" {
-  alias   = "alias"
-  region  = "region"
+  alias  = "alias"
+  region = "region"
 }
 
 resource "aws_lb" "this" {
-  name               = var.name
-  internal           = var.internal
-  load_balancer_type = "application"
-  security_groups    = var.security_groups
-  subnets            = var.subnets
+  name                       = var.name
+  internal                   = var.internal
+  load_balancer_type         = "application"
+  security_groups            = var.security_groups
+  subnets                    = var.subnets
   enable_deletion_protection = var.enable_deletion_protection
 
   tags = var.tags
@@ -42,8 +42,8 @@ resource "aws_lb_listener" "https" {
   port              = "443"
   protocol          = "HTTPS"
 
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = var.certificate_arn
+  ssl_policy      = "ELBSecurityPolicy-2016-08"
+  certificate_arn = var.certificate_arn
 
   default_action {
     type = "fixed-response"

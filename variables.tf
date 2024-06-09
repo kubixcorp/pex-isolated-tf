@@ -1,7 +1,7 @@
 variable "aws_profile" {
   description = "The AWS profile to use"
   type        = string
-  default = "fmoralesIsolated"
+  default     = "fmoralesIsolated"
 }
 
 variable "vpc_virginia_region" {

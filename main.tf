@@ -244,14 +244,14 @@ resource "aws_security_group" "instance_sg_oregon" {
 
 # Instancia web simple en Virginia
 resource "aws_instance" "web_instance_virginia" {
-  provider = aws.virginia
-  ami           = "ami-0c55b159cbfafe1f0" # AMI de Amazon Linux 2
-instance_type = "t2.micro"
-subnet_id     = module.vpc_virginia.public_subnets[0]
+  provider      = aws.virginia
+  ami           = "ami-04e8b3e527208c8cf" # AMI de Amazon Linux 2
+  instance_type = "t2.micro"
+  subnet_id     = module.vpc_virginia.public_subnets[0]
 
-security_groups = [aws_security_group.instance_sg_virginia.name]
+  security_groups = [aws_security_group.instance_sg_virginia.name]
 
-user_data = <<-EOF
+  user_data = <<-EOF
 #!/bin/bash
 echo "Hello, World from Virginia!" > /var/www/html/index.html
 yum install -y httpd
@@ -259,20 +259,20 @@ systemctl start httpd
 systemctl enable httpd
 EOF
 
-tags = {
-Name = "WebInstanceVirginia"
-}
+  tags = {
+    Name = "WebInstanceVirginia"
+  }
 }
 
 resource "aws_instance" "web_instance_oregon" {
-provider = aws.oregon
-ami           = "ami-0c55b159cbfafe1f0" # AMI de Amazon Linux 2
-instance_type = "t2.micro"
-subnet_id     = module.vpc_oregon.public_subnets[0]
+  provider      = aws.oregon
+  ami           = "ami-0676a735c5f8e67c4" # AMI de Amazon Linux 2
+  instance_type = "t2.micro"
+  subnet_id     = module.vpc_oregon.public_subnets[0]
 
-security_groups = [aws_security_group.instance_sg_oregon.name]
+  security_groups = [aws_security_group.instance_sg_oregon.name]
 
-user_data = <<-EOF
+  user_data = <<-EOF
 #!/bin/bash
 echo "Hello, World from Oregon!" > /var/www/html/index.html
 yum install -y httpd
@@ -280,7 +280,7 @@ systemctl start httpd
 systemctl enable httpd
 EOF
 
-tags = {
-Name = "WebInstanceOregon"
-}
+  tags = {
+    Name = "WebInstanceOregon"
+  }
 }
