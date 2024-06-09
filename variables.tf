@@ -78,3 +78,12 @@ variable "project_name" {
   description = "The name of the project"
   type        = string
 }
+variable "certificate_arn_virginia" {
+  description = "The ARN of the certificate for the ALB HTTPS listener in Virginia"
+  type        = string
+}
+
+variable "certificate_arn_oregon" {
+  description = "The ARN of the certificate for the ALB HTTPS listener in Oregon"
+  type        = string
+}

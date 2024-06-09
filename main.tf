@@ -122,7 +122,9 @@ module "alb_virginia" {
   target_group_name          = "my-target-group-virginia"
   target_group_port          = 80
   vpc_id                     = module.vpc_virginia.vpc_id
+  certificate_arn            = var.certificate_arn_virginia
 }
+
 
 # Agregar el balanceador de carga de tipo aplicación (ALB) en Oregón
 resource "aws_security_group" "alb_sg_oregon" {
@@ -161,4 +163,5 @@ module "alb_oregon" {
   target_group_name          = "my-target-group-oregon"
   target_group_port          = 80
   vpc_id                     = module.vpc_oregon.vpc_id
+  certificate_arn            = var.certificate_arn_oregon
 }
