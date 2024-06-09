@@ -99,6 +99,41 @@ resource "aws_security_group" "alb_sg_virginia" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "alb_sg_oregon" {
+  provider    = aws.oregon
+  name_prefix = "alb-sg"
+  description = "Security group for ALB in Oregon"
+  vpc_id      = module.vpc_oregon.vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -125,28 +160,6 @@ module "alb_virginia" {
   certificate_arn            = var.certificate_arn_virginia
 }
 
-# Agregar el balanceador de carga de tipo aplicación (ALB) en Oregón
-resource "aws_security_group" "alb_sg_oregon" {
-  provider    = aws.oregon
-  name_prefix = "alb-sg"
-  description = "Security group for ALB in Oregon"
-  vpc_id      = module.vpc_oregon.vpc_id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 module "alb_oregon" {
   source = "./modules/alb"
   providers = {
@@ -163,4 +176,111 @@ module "alb_oregon" {
   target_group_port          = 80
   vpc_id                     = module.vpc_oregon.vpc_id
   certificate_arn            = var.certificate_arn_oregon
+}
+
+# Grupo de seguridad para instancias en Virginia
+resource "aws_security_group" "instance_sg_virginia" {
+  provider    = aws.virginia
+  name_prefix = "instance-sg"
+  description = "Security group for instances in Virginia"
+  vpc_id      = module.vpc_virginia.vpc_id
+
+  # Permitir tráfico HTTP desde el ALB
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  # Permitir tráfico HTTPS desde el ALB (si es necesario)
+  ingress {
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  # Regla de salida para todo el tráfico
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Grupo de seguridad para instancias en Oregón
+resource "aws_security_group" "instance_sg_oregon" {
+  provider    = aws.oregon
+  name_prefix = "instance-sg"
+  description = "Security group for instances in Oregon"
+  vpc_id      = module.vpc_oregon.vpc_id
+
+  # Permitir tráfico HTTP desde el ALB
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  # Permitir tráfico HTTPS desde el ALB (si es necesario)
+  ingress {
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  # Regla de salida para todo el tráfico
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Instancia web simple en Virginia
+resource "aws_instance" "web_instance_virginia" {
+  provider = aws.virginia
+  ami           = "ami-0c55b159cbfafe1f0" # AMI de Amazon Linux 2
+instance_type = "t2.micro"
+subnet_id     = module.vpc_virginia.public_subnets[0]
+
+security_groups = [aws_security_group.instance_sg_virginia.name]
+
+user_data = <<-EOF
+#!/bin/bash
+echo "Hello, World from Virginia!" > /var/www/html/index.html
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd
+EOF
+
+tags = {
+Name = "WebInstanceVirginia"
+}
+}
+
+resource "aws_instance" "web_instance_oregon" {
+provider = aws.oregon
+ami           = "ami-0c55b159cbfafe1f0" # AMI de Amazon Linux 2
+instance_type = "t2.micro"
+subnet_id     = module.vpc_oregon.public_subnets[0]
+
+security_groups = [aws_security_group.instance_sg_oregon.name]
+
+user_data = <<-EOF
+#!/bin/bash
+echo "Hello, World from Oregon!" > /var/www/html/index.html
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd
+EOF
+
+tags = {
+Name = "WebInstanceOregon"
+}
 }
