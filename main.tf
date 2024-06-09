@@ -144,23 +144,23 @@ resource "aws_security_group" "alb_sg_oregon" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-}
+  }
 }
 
 module "alb_oregon" {
-source = "./modules/alb"
-providers = {
-aws = aws.oregon
-}
+  source = "./modules/alb"
+  providers = {
+    aws = aws.oregon
+  }
 
-name                       = "my-alb-oregon"
-internal                   = false
-security_groups            = [aws_security_group.alb_sg_oregon.id]
-subnets                    = module.vpc_oregon.public_subnets
-enable_deletion_protection = false
-tags                       = { Environment = "production" }
-target_group_name          = "my-target-group-oregon"
-target_group_port          = 80
-vpc_id                     = module.vpc_oregon.vpc_id
-certificate_arn            = var.certificate_arn_oregon
+  name                       = "my-alb-oregon"
+  internal                   = false
+  security_groups            = [aws_security_group.alb_sg_oregon.id]
+  subnets                    = module.vpc_oregon.public_subnets
+  enable_deletion_protection = false
+  tags                       = { Environment = "production" }
+  target_group_name          = "my-target-group-oregon"
+  target_group_port          = 80
+  vpc_id                     = module.vpc_oregon.vpc_id
+  certificate_arn            = var.certificate_arn_oregon
 }
