@@ -1,10 +1,7 @@
-output "virginia_vpc_id" {
-  value = module.vpc_virginia.vpc_id
+output "alb_virginia_dns_name" {
+  value = module.alb_virginia.alb_dns_name
 }
 
-output "oregon_vpc_id" {
-  value = module.vpc_oregon.vpc_id
-}
-output "alb_dns_name" {
-  value = module.alb.alb_dns_name
+output "alb_oregon_dns_name" {
+  value = module.alb_oregon.alb_dns_name
 }

@@ -7,8 +7,8 @@ terraform {
 }
 
 provider "aws" {
-  alias   = "oregon"
-  region  = "us-west-2"
+  alias   = "alias"
+  region  = "region"
 }
 
 resource "aws_lb" "this" {
