@@ -6,13 +6,8 @@ terraform {
   }
 }
 
-provider "aws" {
-  alias  = "current"
-  region = var.region
-}
-
 resource "aws_vpc" "main" {
-  provider   = aws.current
+  provider   = aws
   cidr_block = var.vpc_cidr
   tags = {
     Name = "main-vpc"
@@ -20,7 +15,7 @@ resource "aws_vpc" "main" {
 }
 
 resource "aws_subnet" "public" {
-  provider          = aws.current
+  provider          = aws
   count             = length(var.public_subnet_cidrs)
   vpc_id            = aws_vpc.main.id
   cidr_block        = element(var.public_subnet_cidrs, count.index)
@@ -31,7 +26,7 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_subnet" "private" {
-  provider          = aws.current
+  provider          = aws
   count             = length(var.private_subnet_cidrs)
   vpc_id            = aws_vpc.main.id
   cidr_block        = element(var.private_subnet_cidrs, count.index)
