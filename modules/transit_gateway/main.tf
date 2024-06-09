@@ -22,6 +22,26 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   }
 }
 
+resource "null_resource" "delete_attachment_before_tgw" {
+  depends_on = [
+    aws_ec2_transit_gateway_vpc_attachment.this
+  ]
+
+  provisioner "local-exec" {
+    command = "terraform destroy -target aws_ec2_transit_gateway_vpc_attachment.this"
+  }
+}
+
+resource "aws_ec2_transit_gateway" "this" {
+  provider = aws.current
+  description = "Transit Gateway for region"
+  tags = {
+    Name = "transit-gateway"
+  }
+
+  depends_on = [null_resource.delete_attachment_before_tgw]
+}
+
 output "attachment_id" {
   value = aws_ec2_transit_gateway_vpc_attachment.this.id
 }
