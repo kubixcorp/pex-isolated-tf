@@ -84,3 +84,42 @@ module "transit_gateway_oregon" {
   subnet_ids = module.vpc_oregon.public_subnets
   tgw_id     = aws_ec2_transit_gateway.oregon.id
 }
+
+# Agregar el balanceador de carga de tipo aplicación (ALB)
+resource "aws_security_group" "alb_sg" {
+  provider    = aws.oregon
+  name_prefix = "alb-sg"
+  description = "Security group for ALB"
+  vpc_id      = module.vpc_oregon.vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+module "alb" {
+  source = "./modules/alb"
+  providers = {
+    aws = aws.oregon
+  }
+
+  name                       = "my-alb"
+  internal                   = false
+  security_groups            = [aws_security_group.alb_sg.id]
+  subnets                    = module.vpc_oregon.public_subnets
+  enable_deletion_protection = false
+  tags                       = { Environment = "production" }
+  target_group_name          = "my-target-group"
+  target_group_port          = 80
+  vpc_id                     = module.vpc_oregon.vpc_id
+}

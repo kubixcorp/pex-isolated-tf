@@ -63,3 +63,18 @@ variable "vpc_oregon_region" {
   type        = string
   default     = "us-west-2"
 }
+
+variable "certificate_arn" {
+  description = "The ARN of the certificate for the ALB HTTPS listener"
+  type        = string
+}
+
+variable "environment" {
+  description = "The environment for the project (e.g., dev, prod)"
+  type        = string
+}
+
+variable "project_name" {
+  description = "The name of the project"
+  type        = string
+}
