@@ -13,8 +13,8 @@ provider "aws" {
 }
 
 resource "aws_ec2_transit_gateway_route_table" "this" {
-  provider            = aws.current
-  transit_gateway_id  = var.transit_gateway_id
+  provider           = aws.current
+  transit_gateway_id = var.transit_gateway_id
 }
 
 resource "aws_ec2_transit_gateway_route_table_association" "association" {
