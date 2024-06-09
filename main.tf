@@ -44,6 +44,7 @@ module "vpc_oregon" {
   availability_zones   = var.vpc_oregon_azs
 }
 
+# Transit Gateway for Virginia
 resource "aws_ec2_transit_gateway" "virginia" {
   provider = aws.virginia
   description = "Transit Gateway for Virginia region"
@@ -52,6 +53,7 @@ resource "aws_ec2_transit_gateway" "virginia" {
   }
 }
 
+# Transit Gateway for Oregon
 resource "aws_ec2_transit_gateway" "oregon" {
   provider = aws.oregon
   description = "Transit Gateway for Oregon region"
