@@ -249,7 +249,7 @@ resource "aws_instance" "web_instance_virginia" {
   instance_type = "t2.micro"
   subnet_id     = module.vpc_virginia.public_subnets[0]
 
-  security_groups = [aws_security_group.instance_sg_virginia.name]
+  vpc_security_group_ids = [aws_security_group.instance_sg_virginia.id]
 
   user_data = <<-EOF
               #!/bin/bash
@@ -273,7 +273,7 @@ resource "aws_instance" "web_instance_oregon" {
   instance_type = "t2.micro"
   subnet_id     = module.vpc_oregon.public_subnets[0]
 
-  security_groups = [aws_security_group.instance_sg_oregon.name]
+  vpc_security_group_ids = [aws_security_group.instance_sg_oregon.id]
 
   user_data = <<-EOF
               #!/bin/bash
