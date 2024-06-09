@@ -10,13 +10,13 @@ terraform {
 
 provider "aws" {
   alias   = "virginia"
-  region  = "us-east-1"
+  region  = var.vpc_virginia_region
   profile = var.aws_profile
 }
 
 provider "aws" {
   alias   = "oregon"
-  region  = "us-west-2"
+  region  = var.vpc_oregon_region
   profile = var.aws_profile
 }
 
@@ -125,7 +125,6 @@ module "alb_virginia" {
   certificate_arn            = var.certificate_arn_virginia
 }
 
-
 # Agregar el balanceador de carga de tipo aplicación (ALB) en Oregón
 resource "aws_security_group" "alb_sg_oregon" {
   provider    = aws.oregon
@@ -145,23 +144,23 @@ resource "aws_security_group" "alb_sg_oregon" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }
+}
 }
 
 module "alb_oregon" {
-  source = "./modules/alb"
-  providers = {
-    aws = aws.oregon
-  }
+source = "./modules/alb"
+providers = {
+aws = aws.oregon
+}
 
-  name                       = "my-alb-oregon"
-  internal                   = false
-  security_groups            = [aws_security_group.alb_sg_oregon.id]
-  subnets                    = module.vpc_oregon.public_subnets
-  enable_deletion_protection = false
-  tags                       = { Environment = "production" }
-  target_group_name          = "my-target-group-oregon"
-  target_group_port          = 80
-  vpc_id                     = module.vpc_oregon.vpc_id
-  certificate_arn            = var.certificate_arn_oregon
+name                       = "my-alb-oregon"
+internal                   = false
+security_groups            = [aws_security_group.alb_sg_oregon.id]
+subnets                    = module.vpc_oregon.public_subnets
+enable_deletion_protection = false
+tags                       = { Environment = "production" }
+target_group_name          = "my-target-group-oregon"
+target_group_port          = 80
+vpc_id                     = module.vpc_oregon.vpc_id
+certificate_arn            = var.certificate_arn_oregon
 }
