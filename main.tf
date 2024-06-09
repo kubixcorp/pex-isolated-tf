@@ -1,4 +1,5 @@
 terraform {
+  required_version = ">= 1.0.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -8,15 +9,15 @@ terraform {
 }
 
 provider "aws" {
-  alias  = "virginia"
-  region = "us-east-1"
-  profile = "fmoralesIsolated"
+  alias   = "virginia"
+  region  = "us-east-1"
+  profile = var.aws_profile
 }
 
 provider "aws" {
-  alias  = "oregon"
-  region = "us-west-2"
-  profile = "fmoralesIsolated"
+  alias   = "oregon"
+  region  = "us-west-2"
+  profile = var.aws_profile
 }
 
 module "vpc_virginia" {
@@ -24,11 +25,11 @@ module "vpc_virginia" {
   providers = {
     aws = aws.virginia
   }
-  region               = "us-east-1"
-  vpc_cidr             = "10.0.0.0/16"
-  public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnet_cidrs = ["10.0.3.0/24", "10.0.4.0/24"]
-  availability_zones   = ["us-east-1a", "us-east-1b"]
+  region               = var.vpc_virginia_region
+  vpc_cidr             = var.vpc_virginia_cidr
+  public_subnet_cidrs  = var.vpc_virginia_public_subnets
+  private_subnet_cidrs = var.vpc_virginia_private_subnets
+  availability_zones   = var.vpc_virginia_azs
 }
 
 module "vpc_oregon" {
@@ -36,11 +37,11 @@ module "vpc_oregon" {
   providers = {
     aws = aws.oregon
   }
-  region               = "us-west-2"
-  vpc_cidr             = "10.1.0.0/16"
-  public_subnet_cidrs  = ["10.1.1.0/24", "10.1.2.0/24"]
-  private_subnet_cidrs = ["10.1.3.0/24", "10.1.4.0/24"]
-  availability_zones   = ["us-west-2a", "us-west-2b"]
+  region               = var.vpc_oregon_region
+  vpc_cidr             = var.vpc_oregon_cidr
+  public_subnet_cidrs  = var.vpc_oregon_public_subnets
+  private_subnet_cidrs = var.vpc_oregon_private_subnets
+  availability_zones   = var.vpc_oregon_azs
 }
 
 module "transit_gateway_virginia" {
@@ -48,7 +49,7 @@ module "transit_gateway_virginia" {
   providers = {
     aws = aws.virginia
   }
-  region     = "us-east-1"
+  region     = var.vpc_virginia_region
   vpc_id     = module.vpc_virginia.vpc_id
   subnet_ids = module.vpc_virginia.public_subnets
 }
@@ -58,7 +59,7 @@ module "transit_gateway_oregon" {
   providers = {
     aws = aws.oregon
   }
-  region     = "us-west-2"
+  region     = var.vpc_oregon_region
   vpc_id     = module.vpc_oregon.vpc_id
   subnet_ids = module.vpc_oregon.public_subnets
 }
@@ -68,7 +69,7 @@ module "routing_virginia" {
   providers = {
     aws = aws.virginia
   }
-  region                        = "us-east-1"
+  region                        = var.vpc_virginia_region
   transit_gateway_id            = module.transit_gateway_virginia.tgw_id
   transit_gateway_attachment_id = module.transit_gateway_virginia.attachment_id
   peer_transit_gateway_id       = module.transit_gateway_oregon.tgw_id
@@ -80,29 +81,9 @@ module "routing_oregon" {
   providers = {
     aws = aws.oregon
   }
-  region                        = "us-west-2"
+  region                        = var.vpc_oregon_region
   transit_gateway_id            = module.transit_gateway_oregon.tgw_id
   transit_gateway_attachment_id = module.transit_gateway_oregon.attachment_id
   peer_transit_gateway_id       = module.transit_gateway_virginia.tgw_id
   peer_attachment_id            = module.transit_gateway_virginia.attachment_id
-}
-
-module "vpn_virginia" {
-  source = "./modules/vpn"
-  providers = {
-    aws = aws.virginia
-  }
-  vpc_id            = module.vpc_virginia.vpc_id
-  tgw_id            = module.transit_gateway_virginia.tgw_id
-  tgw_attachment_id = module.transit_gateway_virginia.attachment_id
-}
-
-module "vpn_oregon" {
-  source = "./modules/vpn"
-  providers = {
-    aws = aws.oregon
-  }
-  vpc_id            = module.vpc_oregon.vpc_id
-  tgw_id            = module.transit_gateway_oregon.tgw_id
-  tgw_attachment_id = module.transit_gateway_oregon.attachment_id
 }
