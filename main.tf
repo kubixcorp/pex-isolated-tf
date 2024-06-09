@@ -20,6 +20,7 @@ provider "aws" {
   profile = var.aws_profile
 }
 
+# Crear los VPCs y Subnets
 module "vpc_virginia" {
   source = "./modules/vpc"
   providers = {
@@ -44,7 +45,7 @@ module "vpc_oregon" {
   availability_zones   = var.vpc_oregon_azs
 }
 
-# Transit Gateway for Virginia
+# Crear los Transit Gateways después de los VPCs y Subnets
 resource "aws_ec2_transit_gateway" "virginia" {
   provider = aws.virginia
   description = "Transit Gateway for Virginia region"
@@ -53,7 +54,6 @@ resource "aws_ec2_transit_gateway" "virginia" {
   }
 }
 
-# Transit Gateway for Oregon
 resource "aws_ec2_transit_gateway" "oregon" {
   provider = aws.oregon
   description = "Transit Gateway for Oregon region"
@@ -62,6 +62,7 @@ resource "aws_ec2_transit_gateway" "oregon" {
   }
 }
 
+# Crear las asociaciones de Transit Gateway y rutas después de los Transit Gateways
 module "transit_gateway_virginia" {
   source = "./modules/transit_gateway"
   providers = {
