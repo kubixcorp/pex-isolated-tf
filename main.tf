@@ -213,6 +213,14 @@ resource "aws_security_group" "instance_sg_virginia" {
     security_groups = [aws_security_group.alb_sg_virginia.id]
   }
 
+  # Permitir tráfico SSH desde cualquier IP
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Cambiar a una IP específica o rango para mayor seguridad
+  }
+
   # Regla de salida para todo el tráfico
   egress {
     from_port   = 0
@@ -245,6 +253,14 @@ resource "aws_security_group" "instance_sg_oregon" {
     security_groups = [aws_security_group.alb_sg_oregon.id]
   }
 
+  # Permitir tráfico SSH desde cualquier IP
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Cambiar a una IP específica o rango para mayor seguridad
+  }
+
   # Regla de salida para todo el tráfico
   egress {
     from_port   = 0
@@ -260,6 +276,7 @@ resource "aws_instance" "web_instance_virginia" {
   ami           = "ami-04e8b3e527208c8cf" # AMI de Amazon Linux 2 para us-east-1
   instance_type = "t2.micro"
   subnet_id     = module.vpc_virginia.public_subnets[0]
+  key_name      = "BaseKeyAcces" # Reemplaza con tu par de claves SSH
 
   vpc_security_group_ids = [aws_security_group.instance_sg_virginia.id]
 
@@ -284,6 +301,7 @@ resource "aws_instance" "web_instance_oregon" {
   ami           = "ami-0676a735c5f8e67c4" # AMI de Amazon Linux 2 para us-west-2
   instance_type = "t2.micro"
   subnet_id     = module.vpc_oregon.public_subnets[0]
+  key_name      = "BaseKeyAcces" # Reemplaza con tu par de claves SSH
 
   vpc_security_group_ids = [aws_security_group.instance_sg_oregon.id]
 
