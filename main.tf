@@ -158,6 +158,12 @@ module "alb_virginia" {
   target_group_port          = 80
   vpc_id                     = module.vpc_virginia.vpc_id
   certificate_arn            = var.certificate_arn_virginia
+  health_check_path          = "/"
+  health_check_interval      = 30
+  health_check_timeout       = 5
+  health_check_healthy_threshold = 2
+  health_check_unhealthy_threshold = 2
+  health_check_matcher       = "200-399"
 }
 
 module "alb_oregon" {
@@ -176,6 +182,12 @@ module "alb_oregon" {
   target_group_port          = 80
   vpc_id                     = module.vpc_oregon.vpc_id
   certificate_arn            = var.certificate_arn_oregon
+  health_check_path          = "/"
+  health_check_interval      = 30
+  health_check_timeout       = 5
+  health_check_healthy_threshold = 2
+  health_check_unhealthy_threshold = 2
+  health_check_matcher       = "200-399"
 }
 
 # Grupo de seguridad para instancias en Virginia

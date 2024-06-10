@@ -42,25 +42,25 @@ variable "vpc_oregon_public_subnets" {
 variable "vpc_virginia_private_subnets" {
   description = "Private subnets for the Virginia VPC"
   type        = list(string)
-  default     = ["10.0.3.0/24", "10.0.4.0/24"]
+  default     = ["10.0.3.0/24", "10.0.4.0/24", "10.0.5.0/24"]
 }
 
 variable "vpc_oregon_private_subnets" {
   description = "Private subnets for the Oregon VPC"
   type        = list(string)
-  default     = ["10.1.3.0/24", "10.1.4.0/24"]
+  default     = ["10.1.3.0/24", "10.1.4.0/24", "10.1.5.0/24"]
 }
 
 variable "vpc_virginia_azs" {
   description = "Availability Zones for the Virginia VPC"
   type        = list(string)
-  default     = ["us-east-1a", "us-east-1b"]
+  default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
 variable "vpc_oregon_azs" {
   description = "Availability Zones for the Oregon VPC"
   type        = list(string)
-  default     = ["us-west-2a", "us-west-2b"]
+  default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
 }
 
 variable "certificate_arn_virginia" {

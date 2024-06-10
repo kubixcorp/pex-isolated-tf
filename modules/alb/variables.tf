@@ -1,26 +1,25 @@
 variable "name" {
-  description = "The name of the ALB"
+  description = "The name of the load balancer"
   type        = string
 }
 
 variable "internal" {
-  description = "Whether the load balancer is internal"
+  description = "Whether the load balancer is internal or external"
   type        = bool
-  default     = false
 }
 
 variable "security_groups" {
-  description = "The security groups to associate with the ALB"
+  description = "The security groups to attach to the load balancer"
   type        = list(string)
 }
 
 variable "subnets" {
-  description = "The subnets to associate with the ALB"
+  description = "The subnets to attach to the load balancer"
   type        = list(string)
 }
 
 variable "enable_deletion_protection" {
-  description = "Whether to enable deletion protection"
+  description = "Whether to enable deletion protection on the load balancer"
   type        = bool
   default     = false
 }
@@ -37,16 +36,52 @@ variable "target_group_name" {
 }
 
 variable "target_group_port" {
-  description = "The port of the target group"
+  description = "The port for the target group"
   type        = number
 }
 
 variable "vpc_id" {
-  description = "The VPC ID"
+  description = "The VPC ID where the load balancer and target group will be deployed"
   type        = string
 }
 
 variable "certificate_arn" {
   description = "The ARN of the certificate for the ALB HTTPS listener"
   type        = string
+}
+
+variable "health_check_path" {
+  description = "The path for the health check"
+  type        = string
+  default     = "/"
+}
+
+variable "health_check_interval" {
+  description = "The interval for the health check"
+  type        = number
+  default     = 30
+}
+
+variable "health_check_timeout" {
+  description = "The timeout for the health check"
+  type        = number
+  default     = 5
+}
+
+variable "health_check_healthy_threshold" {
+  description = "The number of healthy thresholds for the health check"
+  type        = number
+  default     = 2
+}
+
+variable "health_check_unhealthy_threshold" {
+  description = "The number of unhealthy thresholds for the health check"
+  type        = number
+  default     = 2
+}
+
+variable "health_check_matcher" {
+  description = "The matcher for the health check"
+  type        = string
+  default     = "200-399"
 }
