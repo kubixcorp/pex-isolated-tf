@@ -20,6 +20,9 @@ provider "aws" {
   profile = var.aws_profile
 }
 
+# Declarar aws_caller_identity
+data "aws_caller_identity" "current" {}
+
 # Crear los VPCs y Subnets
 module "vpc_virginia" {
   source = "./modules/vpc"
@@ -85,6 +88,99 @@ module "transit_gateway_oregon" {
   tgw_id     = aws_ec2_transit_gateway.oregon.id
 }
 
+# Crear el bucket de S3 para los logs del ALB
+resource "aws_s3_bucket" "alb_logs_virginia" {
+  provider = aws.virginia
+  bucket   = "my-unique-alb-logs-bucket-virginia-123456"  # Cambia este nombre por el nombre que prefieras para tu bucket
+
+  tags = {
+    Name = "ALB Logs Bucket Virginia"
+  }
+}
+
+resource "aws_s3_bucket" "alb_logs_oregon" {
+  provider = aws.oregon
+  bucket   = "my-unique-alb-logs-bucket-oregon-123456"  # Cambia este nombre por el nombre que prefieras para tu bucket
+
+  tags = {
+    Name = "ALB Logs Bucket Oregon"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "alb_logs_virginia" {
+  provider = aws.virginia
+  bucket   = aws_s3_bucket.alb_logs_virginia.id
+
+  block_public_acls   = true
+  block_public_policy = true
+  ignore_public_acls  = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_public_access_block" "alb_logs_oregon" {
+  provider = aws.oregon
+  bucket   = aws_s3_bucket.alb_logs_oregon.id
+
+  block_public_acls   = true
+  block_public_policy = true
+  ignore_public_acls  = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_policy" "alb_logs_virginia_policy" {
+  provider = aws.virginia
+  bucket   = aws_s3_bucket.alb_logs_virginia.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "logging.elb.amazonaws.com"
+        }
+        Action = "s3:PutObject"
+        Resource = "${aws_s3_bucket.alb_logs_virginia.arn}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = "${data.aws_caller_identity.current.account_id}"
+          }
+          ArnLike = {
+            "aws:SourceArn" = "arn:aws:elasticloadbalancing:${var.vpc_virginia_region}:${data.aws_caller_identity.current.account_id}:*"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_s3_bucket_policy" "alb_logs_oregon_policy" {
+  provider = aws.oregon
+  bucket   = aws_s3_bucket.alb_logs_oregon.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "logging.elb.amazonaws.com"
+        }
+        Action = "s3:PutObject"
+        Resource = "${aws_s3_bucket.alb_logs_oregon.arn}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = "${data.aws_caller_identity.current.account_id}"
+          }
+          ArnLike = {
+            "aws:SourceArn" = "arn:aws:elasticloadbalancing:${var.vpc_oregon_region}:${data.aws_caller_identity.current.account_id}:*"
+          }
+        }
+      }
+    ]
+  })
+}
+
 # Crear ALBs después de los VPCs y Subnets
 module "alb_virginia" {
   source = "./modules/alb"
@@ -100,6 +196,8 @@ module "alb_virginia" {
   target_group_port      = 80
   vpc_id                 = module.vpc_virginia.vpc_id
   certificate_arn        = var.certificate_arn_virginia
+  access_logs_bucket     = aws_s3_bucket.alb_logs_virginia.bucket
+  access_logs_prefix     = "virginia"
   tags = {
     Name = "ALB Virginia"
   }
@@ -119,6 +217,8 @@ module "alb_oregon" {
   target_group_port      = 80
   vpc_id                 = module.vpc_oregon.vpc_id
   certificate_arn        = var.certificate_arn_oregon
+  access_logs_bucket     = aws_s3_bucket.alb_logs_oregon.bucket
+  access_logs_prefix     = "oregon"
   tags = {
     Name = "ALB Oregon"
   }
@@ -128,6 +228,13 @@ module "alb_oregon" {
 resource "aws_security_group" "alb_sg_virginia" {
   provider = aws.virginia
   vpc_id   = module.vpc_virginia.vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   ingress {
     from_port   = 443
@@ -151,6 +258,13 @@ resource "aws_security_group" "alb_sg_virginia" {
 resource "aws_security_group" "alb_sg_oregon" {
   provider = aws.oregon
   vpc_id   = module.vpc_oregon.vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   ingress {
     from_port   = 443
@@ -182,6 +296,13 @@ resource "aws_security_group" "instance_sg_virginia" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -201,6 +322,13 @@ resource "aws_security_group" "instance_sg_oregon" {
   ingress {
     from_port   = 22
     to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -241,6 +369,13 @@ module "web_instance_virginia" {
   depends_on = [aws_security_group.instance_sg_virginia]
 }
 
+resource "aws_lb_target_group_attachment" "virginia" {
+  provider          = aws.virginia
+  target_group_arn  = module.alb_virginia.target_group_arn
+  target_id         = module.web_instance_virginia.instance_id
+  port              = 80
+}
+
 module "web_instance_oregon" {
   source = "./modules/ec2"
   providers = {
@@ -262,4 +397,11 @@ module "web_instance_oregon" {
     Name = "WebInstanceOregon"
   }
   depends_on = [aws_security_group.instance_sg_oregon]
+}
+
+resource "aws_lb_target_group_attachment" "oregon" {
+  provider          = aws.oregon
+  target_group_arn  = module.alb_oregon.target_group_arn
+  target_id         = module.web_instance_oregon.instance_id
+  port              = 80
 }

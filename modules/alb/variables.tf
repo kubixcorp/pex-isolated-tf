@@ -85,3 +85,14 @@ variable "health_check_matcher" {
   type        = string
   default     = "200-399"
 }
+
+variable "access_logs_bucket" {
+  description = "The S3 bucket for ALB access logs"
+  type        = string
+}
+
+variable "access_logs_prefix" {
+  description = "The prefix for ALB access logs"
+  type        = string
+  default     = "alb-logs"
+}
