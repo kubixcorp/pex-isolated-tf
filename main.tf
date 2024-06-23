@@ -19,6 +19,13 @@ provider "aws" {
   region  = var.vpc_oregon_region
   profile = var.aws_profile
 }
+
+provider "aws" {
+  alias   = "route53"
+  region  = var.vpc_virginia_region
+  profile = var.aws_profile_route53
+}
+
 # Crear los VPCs y Subnets
 module "vpc_virginia" {
   source = "./modules/vpc"
@@ -155,7 +162,7 @@ module "alb_virginia" {
   vpc_id                     = module.vpc_virginia.vpc_id
   certificate_arn            = var.certificate_arn_virginia
   access_logs_bucket         = aws_s3_bucket.alb_logs_virginia.bucket
-  enable_access_logs = true
+  enable_access_logs         = true
   tags = {
     Name = "ALB Virginia"
   }
@@ -337,4 +344,21 @@ resource "aws_lb_target_group_attachment" "oregon" {
   target_group_arn = module.alb_oregon.target_group_arn
   target_id        = module.web_instance_oregon.instance_id
   port             = 80
+}
+
+resource "aws_route53_record" "virginia" {
+  provider = aws.route53
+  zone_id = "Z07774303G2AYPCGKGZSX"
+  name     = "test.isolated-virginia.kubixcorp.com"
+  type     = "CNAME"
+  ttl      = 300
+  records = [module.alb_virginia.alb_dns_name]
+}
+resource "aws_route53_record" "oregon" {
+  provider = aws.route53
+  zone_id = "Z07774303G2AYPCGKGZSX"
+  name     = "test.isolated-oregon.kubixcorp.com"
+  type     = "CNAME"
+  ttl      = 300
+  records = [module.alb_oregon.alb_dns_name]
 }

@@ -8,15 +8,15 @@ terraform {
 }
 
 resource "aws_lb" "this" {
-  provider            = aws
-  name                = var.name
-  internal            = var.internal
-  load_balancer_type  = "application"
-  security_groups     = var.security_groups
-  subnets             = var.subnets
+  provider                   = aws
+  name                       = var.name
+  internal                   = var.internal
+  load_balancer_type         = "application"
+  security_groups            = var.security_groups
+  subnets                    = var.subnets
   enable_deletion_protection = var.enable_deletion_protection
 
- access_logs {
+  access_logs {
     bucket  = var.access_logs_bucket
     enabled = var.enable_access_logs
   }
@@ -25,12 +25,12 @@ resource "aws_lb" "this" {
 }
 
 resource "aws_lb_target_group" "this" {
-  provider     = aws
-  name         = var.target_group_name
-  port         = var.target_group_port
-  protocol     = "HTTP"
-  vpc_id       = var.vpc_id
-  target_type  = "instance"
+  provider    = aws
+  name        = var.target_group_name
+  port        = var.target_group_port
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "instance"
 
   health_check {
     path                = var.health_check_path

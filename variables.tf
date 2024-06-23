@@ -3,6 +3,11 @@ variable "aws_profile" {
   type        = string
 }
 
+variable "aws_profile_route53" {
+  description = "The AWS profile to use Kubixcorp TEMP"
+  type        = string
+}
+
 variable "vpc_virginia_region" {
   description = "The region for the Virginia VPC"
   type        = string
@@ -64,11 +69,11 @@ variable "vpc_oregon_azs" {
 }
 
 variable "certificate_arn_virginia" {
-  description = "The ARN of the certificate for the ALB HTTPS listener in Virginia"
+  description = "The ARN of the certificate for the ALB HTTPS listener in Virginia  Kubixcorp TEMP"
   type        = string
 }
 
 variable "certificate_arn_oregon" {
-  description = "The ARN of the certificate for the ALB HTTPS listener in Oregon"
+  description = "The ARN of the certificate for the ALB HTTPS listener in Oregon  Kubixcorp TEMP"
   type        = string
 }
