@@ -25,7 +25,6 @@ provider "aws" {
   region  = var.vpc_virginia_region
   profile = var.aws_profile_route53
 }
-
 # Crear los VPCs y Subnets
 module "vpc_virginia" {
   source = "./modules/vpc"
@@ -250,6 +249,7 @@ resource "aws_security_group" "instance_sg_virginia" {
     to_port   = 80
     protocol  = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    //security_groups = [aws_security_group.alb_sg_virginia.id]
   }
 
   egress {
@@ -299,10 +299,11 @@ module "web_instance_virginia" {
   providers = {
     aws = aws.virginia
   }
-  ami           = "ami-04e8b3e527208c8cf"
+  ami       = "ami-04e8b3e527208c8cf"
   instance_type = "t2.micro"
-  subnet_id     = module.vpc_virginia.public_subnets[0]
-  key_name      = "BaseKeyAcces"
+  subnet_id          = module.vpc_virginia.public_subnets[0]
+  //subnet_id = module.vpc_virginia.private_subnets[0]
+  key_name  = "BaseKeyAcces"
   security_group_ids = [aws_security_group.instance_sg_virginia.id]
   user_data = templatefile("${path.module}/scripts/web_instance_data.sh", {
     region = "Virginia"
@@ -325,10 +326,11 @@ module "web_instance_oregon" {
   providers = {
     aws = aws.oregon
   }
-  ami           = "ami-0676a735c5f8e67c4"
+  ami       = "ami-0676a735c5f8e67c4"
   instance_type = "t2.micro"
-  subnet_id     = module.vpc_oregon.public_subnets[0]
-  key_name      = "BaseKeyAcces"
+  subnet_id          = module.vpc_oregon.public_subnets[0]
+  //subnet_id = module.vpc_oregon.private_subnets[0]
+  key_name  = "BaseKeyAcces"
   security_group_ids = [aws_security_group.instance_sg_oregon.id]
   user_data = templatefile("${path.module}/scripts/web_instance_data.sh", {
     region = "Oregon"
@@ -348,15 +350,16 @@ resource "aws_lb_target_group_attachment" "oregon" {
 
 resource "aws_route53_record" "virginia" {
   provider = aws.route53
-  zone_id = "Z07774303G2AYPCGKGZSX"
+  zone_id  = "Z07774303G2AYPCGKGZSX"
   name     = "test.isolated-virginia.kubixcorp.com"
   type     = "CNAME"
   ttl      = 300
   records = [module.alb_virginia.alb_dns_name]
 }
+
 resource "aws_route53_record" "oregon" {
   provider = aws.route53
-  zone_id = "Z07774303G2AYPCGKGZSX"
+  zone_id  = "Z07774303G2AYPCGKGZSX"
   name     = "test.isolated-oregon.kubixcorp.com"
   type     = "CNAME"
   ttl      = 300
