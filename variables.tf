@@ -39,17 +39,17 @@ variable "vpc_oregon_public_subnets" {
   default     = ["10.1.1.0/24", "10.1.2.0/24"]
 }
 
-variable "vpc_virginia_private_subnets" {
+/*variable "vpc_virginia_private_subnets" {
   description = "Private subnets for the Virginia VPC"
   type        = list(string)
   default     = ["10.0.3.0/24", "10.0.4.0/24", "10.0.5.0/24"]
-}
+}*/
 
-variable "vpc_oregon_private_subnets" {
+/*variable "vpc_oregon_private_subnets" {
   description = "Private subnets for the Oregon VPC"
-  type        = list(string)
-  default     = ["10.1.3.0/24", "10.1.4.0/24", "10.1.5.0/24"]
-}
+  type = list(string)
+  default = ["10.1.3.0/24", "10.1.4.0/24", "10.1.5.0/24"]
+}*/
 
 variable "vpc_virginia_azs" {
   description = "Availability Zones for the Virginia VPC"

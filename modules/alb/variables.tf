@@ -10,12 +10,12 @@ variable "internal" {
 
 variable "security_groups" {
   description = "The security groups to attach to the load balancer"
-  type        = list(string)
+  type = list(string)
 }
 
 variable "subnets" {
   description = "The subnets to attach to the load balancer"
-  type        = list(string)
+  type = list(string)
 }
 
 variable "enable_deletion_protection" {
@@ -26,8 +26,8 @@ variable "enable_deletion_protection" {
 
 variable "tags" {
   description = "A map of tags to assign to the resource"
-  type        = map(string)
-  default     = {}
+  type = map(string)
+  default = {}
 }
 
 variable "target_group_name" {
@@ -89,10 +89,4 @@ variable "health_check_matcher" {
 variable "access_logs_bucket" {
   description = "The S3 bucket for ALB access logs"
   type        = string
-}
-
-variable "access_logs_prefix" {
-  description = "The prefix for ALB access logs"
-  type        = string
-  default     = "alb-logs"
 }

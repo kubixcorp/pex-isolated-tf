@@ -1,7 +1,8 @@
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = "~> 4.16"
     }
   }
 }
@@ -15,11 +16,10 @@ resource "aws_lb" "this" {
   subnets             = var.subnets
   enable_deletion_protection = var.enable_deletion_protection
 
-  access_logs {
+ /* access_logs {
     bucket  = var.access_logs_bucket
-    prefix  = var.access_logs_prefix
     enabled = true
-  }
+  }*/
 
   tags = var.tags
 }
