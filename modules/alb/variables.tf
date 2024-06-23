@@ -90,3 +90,9 @@ variable "access_logs_bucket" {
   description = "The S3 bucket for ALB access logs"
   type        = string
 }
+
+variable "enable_access_logs" {
+  description = "Enable access logs on the load balancer"
+  type        = bool
+  default     = false
+}

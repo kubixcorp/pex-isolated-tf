@@ -28,7 +28,7 @@ module "vpc_virginia" {
   region               = var.vpc_virginia_region
   vpc_cidr             = var.vpc_virginia_cidr
   public_subnet_cidrs  = var.vpc_virginia_public_subnets
-  //private_subnet_cidrs = var.vpc_virginia_private_subnets
+  private_subnet_cidrs = var.vpc_virginia_private_subnets
   availability_zones   = var.vpc_virginia_azs
 }
 
@@ -40,7 +40,7 @@ module "vpc_oregon" {
   region               = var.vpc_oregon_region
   vpc_cidr             = var.vpc_oregon_cidr
   public_subnet_cidrs  = var.vpc_oregon_public_subnets
-  //private_subnet_cidrs = var.vpc_oregon_private_subnets
+  private_subnet_cidrs = var.vpc_oregon_private_subnets
   availability_zones   = var.vpc_oregon_azs
 }
 # Crear los Transit Gateways después de los VPCs y Subnets
@@ -112,14 +112,6 @@ resource "aws_s3_bucket_policy" "alb_logs_virginia_policy" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::127311923021:root"
-        }
-        Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.alb_logs_virginia.arn}/*"
-      },
-      {
-        Effect = "Allow"
-        Principal = {
           AWS = data.aws_elb_service_account.main.arn
         }
         Action   = "s3:PutObject"
@@ -136,14 +128,6 @@ resource "aws_s3_bucket_policy" "alb_logs_oregon_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::127311923021:root"
-        }
-        Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.alb_logs_oregon.arn}/*"
-      },
       {
         Effect = "Allow"
         Principal = {
@@ -171,6 +155,7 @@ module "alb_virginia" {
   vpc_id                     = module.vpc_virginia.vpc_id
   certificate_arn            = var.certificate_arn_virginia
   access_logs_bucket         = aws_s3_bucket.alb_logs_virginia.bucket
+  enable_access_logs = true
   tags = {
     Name = "ALB Virginia"
   }
@@ -195,18 +180,10 @@ module "alb_oregon" {
     Name = "ALB Oregon"
   }
 }
-
 # Crear los Security Groups
 resource "aws_security_group" "alb_sg_virginia" {
   provider = aws.virginia
   vpc_id   = module.vpc_virginia.vpc_id
-
-  ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   ingress {
     from_port = 443
@@ -230,13 +207,6 @@ resource "aws_security_group" "alb_sg_virginia" {
 resource "aws_security_group" "alb_sg_oregon" {
   provider = aws.oregon
   vpc_id   = module.vpc_oregon.vpc_id
-
-  ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   ingress {
     from_port = 443
@@ -316,7 +286,6 @@ resource "aws_security_group" "instance_sg_oregon" {
     Name = "Instance Security Group Oregon"
   }
 }
-
 # Crear instancias EC2 usando el nuevo módulo
 module "web_instance_virginia" {
   source = "./modules/ec2"

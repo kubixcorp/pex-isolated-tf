@@ -16,10 +16,10 @@ resource "aws_lb" "this" {
   subnets             = var.subnets
   enable_deletion_protection = var.enable_deletion_protection
 
- /* access_logs {
+ access_logs {
     bucket  = var.access_logs_bucket
-    enabled = true
-  }*/
+    enabled = var.enable_access_logs
+  }
 
   tags = var.tags
 }
@@ -44,7 +44,7 @@ resource "aws_lb_target_group" "this" {
   tags = var.tags
 }
 
-resource "aws_lb_listener" "http" {
+/*resource "aws_lb_listener" "http" {
   provider          = aws
   load_balancer_arn = aws_lb.this.arn
   port              = 80
@@ -54,7 +54,7 @@ resource "aws_lb_listener" "http" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this.arn
   }
-}
+}*/
 
 resource "aws_lb_listener" "https" {
   provider          = aws
