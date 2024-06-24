@@ -145,6 +145,100 @@ resource "aws_s3_bucket_policy" "alb_logs_oregon_policy" {
     ]
   })
 }
+
+resource "aws_wafv2_ip_set" "allowed_ips_virginia" {
+  provider = aws.virginia
+  name               = "allowed-ips-virginia"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = var.allowed_ips
+}
+
+resource "aws_wafv2_ip_set" "allowed_ips_oregon" {
+  provider = aws.oregon
+  name               = "allowed-ips-oregon"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = var.allowed_ips
+}
+
+resource "aws_wafv2_web_acl" "web_acl_virginia" {
+  provider = aws.virginia
+  name        = "alb-web-acl-virginia"
+  scope       = "REGIONAL"
+  description = "Web ACL to allow specific IPs"
+
+  default_action {
+    block {}
+  }
+
+  rule {
+    name     = "allow-specific-ips-virginia"
+    priority = 1
+
+    action {
+      allow {}
+    }
+
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.allowed_ips_virginia.arn
+      }
+    }
+
+    visibility_config {
+      sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-specific-ips-virginia"
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "web-acl-metrics-virginia"
+    sampled_requests_enabled   = true
+  }
+  depends_on = [aws_wafv2_ip_set.allowed_ips_virginia]
+}
+
+resource "aws_wafv2_web_acl" "web_acl_oregon" {
+  provider = aws.oregon
+  name        = "alb-web-acl-oregon"
+  scope       = "REGIONAL"
+  description = "Web ACL to allow specific IPs"
+
+  default_action {
+    block {}
+  }
+
+  rule {
+    name     = "allow-specific-ips-oregon"
+    priority = 1
+
+    action {
+      allow {}
+    }
+
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.allowed_ips_oregon.arn
+      }
+    }
+
+    visibility_config {
+      sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-specific-ips-oregon"
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "web-acl-metrics-oregon"
+    sampled_requests_enabled   = true
+  }
+  depends_on = [aws_wafv2_ip_set.allowed_ips_oregon]
+}
 # Crear ALBs después de los VPCs y Subnets
 module "alb_virginia" {
   source = "./modules/alb"
@@ -165,6 +259,14 @@ module "alb_virginia" {
   tags = {
     Name = "ALB Virginia"
   }
+  depends_on = [aws_wafv2_web_acl.web_acl_virginia]
+}
+
+resource "aws_wafv2_web_acl_association" "web_acl_association_virginia" {
+  provider = aws.virginia
+  resource_arn = module.alb_virginia.alb_arn
+  web_acl_arn  = aws_wafv2_web_acl.web_acl_virginia.arn
+  depends_on   = [module.alb_virginia]
 }
 
 module "alb_oregon" {
@@ -185,6 +287,14 @@ module "alb_oregon" {
   tags = {
     Name = "ALB Oregon"
   }
+  depends_on = [aws_wafv2_web_acl.web_acl_oregon]
+}
+
+resource "aws_wafv2_web_acl_association" "web_acl_association_oregon" {
+  provider = aws.oregon
+  resource_arn = module.alb_oregon.alb_arn
+  web_acl_arn  = aws_wafv2_web_acl.web_acl_oregon.arn
+  depends_on   = [module.alb_oregon]
 }
 # Crear los Security Groups
 resource "aws_security_group" "alb_sg_virginia" {
@@ -342,7 +452,7 @@ resource "aws_security_group" "bastion_sg_oregon" {
 
 resource "aws_iam_role" "ssm_role" {
   provider = aws.virginia
-  name = "ssm_role"
+  name     = "ssm_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -358,37 +468,37 @@ resource "aws_iam_role" "ssm_role" {
     ]
   })
 }
+
 resource "aws_iam_role_policy_attachment" "ssm_attach" {
-  provider    = aws.virginia
+  provider   = aws.virginia
   role       = aws_iam_role.ssm_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_instance_profile" "ssm_instance_profile" {
   provider = aws.virginia
-  name = "my_ssm_instance_profile"
-  role = aws_iam_role.ssm_role.name
+  name     = "my_ssm_instance_profile"
+  role     = aws_iam_role.ssm_role.name
 }
-
 # Crear instancias EC2 usando el nuevo módulo
 module "web_instance_virginia" {
   source = "./modules/ec2"
   providers = {
     aws = aws.virginia
   }
-  ami           = "ami-04e8b3e527208c8cf"
-  instance_type = "t2.micro"
-  #subnet_id          = module.vpc_virginia.public_subnets[0]
+  ami                = "ami-04e8b3e527208c8cf"
+  instance_type      = "t2.micro"
   subnet_id          = module.vpc_virginia.private_subnets[0]
   key_name           = "BaseKeyAcces"
   security_group_ids = [aws_security_group.instance_sg_virginia.id]
   user_data = templatefile("${path.module}/scripts/web_instance_data.sh", {
     region = "Virginia"
   })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
   tags = {
     Name = "WebInstanceVirginia"
   }
-  depends_on = [aws_security_group.instance_sg_virginia]
+  depends_on = [aws_security_group.instance_sg_virginia, aws_iam_instance_profile.ssm_instance_profile]
 }
 
 resource "aws_lb_target_group_attachment" "virginia" {
@@ -403,19 +513,19 @@ module "web_instance_oregon" {
   providers = {
     aws = aws.oregon
   }
-  ami           = "ami-0676a735c5f8e67c4"
-  instance_type = "t2.micro"
-  //subnet_id          = module.vpc_oregon.public_subnets[0]
+  ami                = "ami-0676a735c5f8e67c4"
+  instance_type      = "t2.micro"
   subnet_id          = module.vpc_oregon.private_subnets[0]
   key_name           = "BaseKeyAcces"
   security_group_ids = [aws_security_group.instance_sg_oregon.id]
   user_data = templatefile("${path.module}/scripts/web_instance_data.sh", {
     region = "Oregon"
   })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
   tags = {
     Name = "WebInstanceOregon"
   }
-  depends_on = [aws_security_group.instance_sg_oregon]
+  depends_on = [aws_security_group.instance_sg_oregon, aws_iam_instance_profile.ssm_instance_profile]
 }
 
 resource "aws_lb_target_group_attachment" "oregon" {
@@ -437,7 +547,7 @@ resource "aws_instance" "bastion_virginia" {
   })
   iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
   tags = {
-    Name = "Bastion"
+    Name = "BastionVirginia"
   }
   depends_on = [aws_security_group.bastion_sg_virginia, aws_iam_instance_profile.ssm_instance_profile]
 }
@@ -454,7 +564,7 @@ resource "aws_instance" "bastion_oregon" {
   })
   iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
   tags = {
-    Name = "Bastion"
+    Name = "BastionOregon"
   }
   depends_on = [aws_security_group.bastion_sg_oregon, aws_iam_instance_profile.ssm_instance_profile]
 }

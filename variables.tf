@@ -34,38 +34,38 @@ variable "vpc_oregon_cidr" {
 
 variable "vpc_virginia_public_subnets" {
   description = "Public subnets for the Virginia VPC"
-  type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+  type = list(string)
+  default = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
 variable "vpc_oregon_public_subnets" {
   description = "Public subnets for the Oregon VPC"
-  type        = list(string)
-  default     = ["10.1.1.0/24", "10.1.2.0/24"]
+  type = list(string)
+  default = ["10.1.1.0/24", "10.1.2.0/24"]
 }
 
 variable "vpc_virginia_private_subnets" {
   description = "Private subnets for the Virginia VPC"
-  type        = list(string)
-  default     = ["10.0.3.0/24", "10.0.4.0/24"]
+  type = list(string)
+  default = ["10.0.3.0/24", "10.0.4.0/24"]
 }
 
 variable "vpc_oregon_private_subnets" {
   description = "Private subnets for the Oregon VPC"
-  type        = list(string)
-  default     = ["10.1.3.0/24", "10.1.4.0/24"]
+  type = list(string)
+  default = ["10.1.3.0/24", "10.1.4.0/24"]
 }
 
 variable "vpc_virginia_azs" {
   description = "Availability Zones for the Virginia VPC"
-  type        = list(string)
-  default     = ["us-east-1a", "us-east-1b"]
+  type = list(string)
+  default = ["us-east-1a", "us-east-1b"]
 }
 
 variable "vpc_oregon_azs" {
   description = "Availability Zones for the Oregon VPC"
-  type        = list(string)
-  default     = ["us-west-2a", "us-west-2b"]
+  type = list(string)
+  default = ["us-west-2a", "us-west-2b"]
 }
 
 variable "certificate_arn_virginia" {
@@ -75,5 +75,16 @@ variable "certificate_arn_virginia" {
 
 variable "certificate_arn_oregon" {
   description = "The ARN of the certificate for the ALB HTTPS listener in Oregon  Kubixcorp TEMP"
+  type        = string
+}
+
+variable "allowed_ips" {
+  description = "List of IPs allowed to access the ALB"
+  type = list(string)
+  default = ["203.0.113.0/24", "192.168.1.24/32"]
+}
+
+variable "my_ip" {
+  description = "My IP address"
   type        = string
 }
