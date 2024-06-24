@@ -1,7 +1,9 @@
 #!/bin/bash
 
 yum update -y
-yum install -y httpd
+sudo yum install -y amazon-ssm-agent telnet httpd
+sudo systemctl enable amazon-ssm-agent
+sudo systemctl start amazon-ssm-agent
 systemctl start httpd
 systemctl enable httpd
 

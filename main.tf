@@ -153,7 +153,7 @@ module "alb_virginia" {
   }
   name                       = "alb-virginia"
   internal                   = false
-  security_groups = [aws_security_group.alb_sg_virginia.id]
+  security_groups            = [aws_security_group.alb_sg_virginia.id]
   subnets                    = module.vpc_virginia.public_subnets
   enable_deletion_protection = false
   target_group_name          = "tg-virginia"
@@ -174,7 +174,7 @@ module "alb_oregon" {
   }
   name                       = "alb-oregon"
   internal                   = false
-  security_groups = [aws_security_group.alb_sg_oregon.id]
+  security_groups            = [aws_security_group.alb_sg_oregon.id]
   subnets                    = module.vpc_oregon.public_subnets
   enable_deletion_protection = false
   target_group_name          = "tg-oregon"
@@ -192,16 +192,16 @@ resource "aws_security_group" "alb_sg_virginia" {
   vpc_id   = module.vpc_virginia.vpc_id
 
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -215,16 +215,16 @@ resource "aws_security_group" "alb_sg_oregon" {
   vpc_id   = module.vpc_oregon.vpc_id
 
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -238,24 +238,24 @@ resource "aws_security_group" "instance_sg_virginia" {
   vpc_id   = module.vpc_virginia.vpc_id
 
   ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     //security_groups = [aws_security_group.alb_sg_virginia.id]
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -269,23 +269,23 @@ resource "aws_security_group" "instance_sg_oregon" {
   vpc_id   = module.vpc_oregon.vpc_id
 
   ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -293,17 +293,94 @@ resource "aws_security_group" "instance_sg_oregon" {
     Name = "Instance Security Group Oregon"
   }
 }
+
+resource "aws_security_group" "bastion_sg_virginia" {
+  provider = aws.virginia
+  vpc_id   = module.vpc_virginia.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "Bastion SG Virginia"
+  }
+}
+
+resource "aws_security_group" "bastion_sg_oregon" {
+  provider = aws.oregon
+  vpc_id   = module.vpc_oregon.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "Bastion SG Oregon"
+  }
+}
+
+resource "aws_iam_role" "ssm_role" {
+  provider = aws.virginia
+  name = "ssm_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        },
+        Action = "sts:AssumeRole",
+        Sid    = "AllowEC2AssumeRole"
+      }
+    ]
+  })
+}
+resource "aws_iam_role_policy_attachment" "ssm_attach" {
+  provider    = aws.virginia
+  role       = aws_iam_role.ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "ssm_instance_profile" {
+  provider = aws.virginia
+  name = "my_ssm_instance_profile"
+  role = aws_iam_role.ssm_role.name
+}
+
 # Crear instancias EC2 usando el nuevo módulo
 module "web_instance_virginia" {
   source = "./modules/ec2"
   providers = {
     aws = aws.virginia
   }
-  ami       = "ami-04e8b3e527208c8cf"
+  ami           = "ami-04e8b3e527208c8cf"
   instance_type = "t2.micro"
   #subnet_id          = module.vpc_virginia.public_subnets[0]
-  subnet_id = module.vpc_virginia.private_subnets[0]
-  key_name  = "BaseKeyAcces"
+  subnet_id          = module.vpc_virginia.private_subnets[0]
+  key_name           = "BaseKeyAcces"
   security_group_ids = [aws_security_group.instance_sg_virginia.id]
   user_data = templatefile("${path.module}/scripts/web_instance_data.sh", {
     region = "Virginia"
@@ -326,11 +403,11 @@ module "web_instance_oregon" {
   providers = {
     aws = aws.oregon
   }
-  ami       = "ami-0676a735c5f8e67c4"
+  ami           = "ami-0676a735c5f8e67c4"
   instance_type = "t2.micro"
-  subnet_id          = module.vpc_oregon.public_subnets[0]
-  //subnet_id = module.vpc_oregon.private_subnets[0]
-  key_name  = "BaseKeyAcces"
+  //subnet_id          = module.vpc_oregon.public_subnets[0]
+  subnet_id          = module.vpc_oregon.private_subnets[0]
+  key_name           = "BaseKeyAcces"
   security_group_ids = [aws_security_group.instance_sg_oregon.id]
   user_data = templatefile("${path.module}/scripts/web_instance_data.sh", {
     region = "Oregon"
@@ -348,13 +425,47 @@ resource "aws_lb_target_group_attachment" "oregon" {
   port             = 80
 }
 
+resource "aws_instance" "bastion_virginia" {
+  provider               = aws.virginia
+  ami                    = "ami-04e8b3e527208c8cf"
+  instance_type          = "t2.micro"
+  subnet_id              = module.vpc_virginia.public_subnets[0]
+  key_name               = "BaseKeyAcces"
+  vpc_security_group_ids = [aws_security_group.bastion_sg_virginia.id]
+  user_data = templatefile("${path.module}/scripts/networks_utils.sh", {
+    region = "Virginia"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  tags = {
+    Name = "Bastion"
+  }
+  depends_on = [aws_security_group.bastion_sg_virginia, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_instance" "bastion_oregon" {
+  provider               = aws.oregon
+  ami                    = "ami-0676a735c5f8e67c4"
+  instance_type          = "t2.micro"
+  subnet_id              = module.vpc_oregon.public_subnets[0]
+  key_name               = "BaseKeyAcces"
+  vpc_security_group_ids = [aws_security_group.bastion_sg_oregon.id]
+  user_data = templatefile("${path.module}/scripts/networks_utils.sh", {
+    region = "Oregon"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  tags = {
+    Name = "Bastion"
+  }
+  depends_on = [aws_security_group.bastion_sg_oregon, aws_iam_instance_profile.ssm_instance_profile]
+}
+
 resource "aws_route53_record" "virginia" {
   provider = aws.route53
   zone_id  = "Z07774303G2AYPCGKGZSX"
   name     = "test.isolated-virginia.kubixcorp.com"
   type     = "CNAME"
   ttl      = 300
-  records = [module.alb_virginia.alb_dns_name]
+  records  = [module.alb_virginia.alb_dns_name]
 }
 
 resource "aws_route53_record" "oregon" {
@@ -363,24 +474,6 @@ resource "aws_route53_record" "oregon" {
   name     = "test.isolated-oregon.kubixcorp.com"
   type     = "CNAME"
   ttl      = 300
-  records = [module.alb_oregon.alb_dns_name]
+  records  = [module.alb_oregon.alb_dns_name]
 }
 
-module "test_instance_virginia" {
-  source = "./modules/ec2"
-  providers = {
-    aws = aws.virginia
-  }
-  ami       = "ami-04e8b3e527208c8cf"
-  instance_type = "t2.micro"
-  subnet_id          = module.vpc_virginia.private_subnets[0]
-  key_name  = "BaseKeyAcces"
-  security_group_ids = [aws_security_group.instance_sg_virginia.id]
-  user_data = templatefile("${path.module}/scripts/web_instance_data.sh", {
-    region = "Virginia"
-  })
-  tags = {
-    Name = "TestInstanceVirginia"
-  }
-  depends_on = [aws_security_group.instance_sg_virginia]
-}
