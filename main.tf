@@ -301,8 +301,8 @@ module "web_instance_virginia" {
   }
   ami       = "ami-04e8b3e527208c8cf"
   instance_type = "t2.micro"
-  subnet_id          = module.vpc_virginia.public_subnets[0]
-  //subnet_id = module.vpc_virginia.private_subnets[0]
+  #subnet_id          = module.vpc_virginia.public_subnets[0]
+  subnet_id = module.vpc_virginia.private_subnets[0]
   key_name  = "BaseKeyAcces"
   security_group_ids = [aws_security_group.instance_sg_virginia.id]
   user_data = templatefile("${path.module}/scripts/web_instance_data.sh", {
@@ -364,4 +364,23 @@ resource "aws_route53_record" "oregon" {
   type     = "CNAME"
   ttl      = 300
   records = [module.alb_oregon.alb_dns_name]
+}
+
+module "test_instance_virginia" {
+  source = "./modules/ec2"
+  providers = {
+    aws = aws.virginia
+  }
+  ami       = "ami-04e8b3e527208c8cf"
+  instance_type = "t2.micro"
+  subnet_id          = module.vpc_virginia.private_subnets[0]
+  key_name  = "BaseKeyAcces"
+  security_group_ids = [aws_security_group.instance_sg_virginia.id]
+  user_data = templatefile("${path.module}/scripts/web_instance_data.sh", {
+    region = "Virginia"
+  })
+  tags = {
+    Name = "TestInstanceVirginia"
+  }
+  depends_on = [aws_security_group.instance_sg_virginia]
 }
