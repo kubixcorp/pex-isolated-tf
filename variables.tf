@@ -81,7 +81,7 @@ variable "certificate_arn_oregon" {
 variable "allowed_ips" {
   description = "List of IPs allowed to access the ALB"
   type = list(string)
-  default = ["203.0.113.0/24", "192.168.1.24/32"]
+  default = ["203.0.113.0/24", "179.60.173.0/32"]
 }
 
 /*variable "my_ip" {

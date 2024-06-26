@@ -44,18 +44,6 @@ resource "aws_lb_target_group" "this" {
   tags = var.tags
 }
 
-/*resource "aws_lb_listener" "http" {
-  provider          = aws
-  load_balancer_arn = aws_lb.this.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
-  }
-}*/
-
 resource "aws_lb_listener" "https" {
   provider          = aws
   load_balancer_arn = aws_lb.this.arn
@@ -65,9 +53,14 @@ resource "aws_lb_listener" "https" {
   certificate_arn   = var.certificate_arn
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Not Found"
+      status_code  = "404"
+    }
   }
+
 }
 
 

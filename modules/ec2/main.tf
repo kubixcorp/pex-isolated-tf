@@ -7,6 +7,7 @@ terraform {
   }
 }
 
+
 resource "aws_instance" "this" {
   ami           = var.ami
   instance_type = var.instance_type
@@ -16,4 +17,8 @@ resource "aws_instance" "this" {
   user_data = var.user_data
   tags = var.tags
   iam_instance_profile = var.iam_instance_profile
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = var.instance_volume
+  }
 }

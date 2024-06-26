@@ -96,3 +96,12 @@ variable "enable_access_logs" {
   type        = bool
   default     = false
 }
+
+variable "routes" {
+  description = "A map of routes for the ALB to handle"
+  default = {}
+  type = map(object({
+    target_group_arn = string
+    host_headers = list(string)
+  }))
+}
