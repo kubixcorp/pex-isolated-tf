@@ -247,7 +247,7 @@ module "alb_virginia" {
   }
   name                       = "alb-virginia"
   internal                   = false
-  security_groups = [aws_security_group.alb_sg_virginia.id]
+  security_groups            = [aws_security_group.alb_sg_virginia.id]
   subnets                    = module.vpc_virginia.public_subnets
   enable_deletion_protection = false
   target_group_name          = "tg-virginia"
@@ -267,7 +267,7 @@ resource "aws_wafv2_web_acl_association" "web_acl_association_virginia" {
   provider     = aws.virginia
   resource_arn = module.alb_virginia.alb_arn
   web_acl_arn  = aws_wafv2_web_acl.web_acl_virginia.arn
-  depends_on = [module.alb_virginia, aws_wafv2_web_acl.web_acl_virginia]
+  depends_on   = [module.alb_virginia, aws_wafv2_web_acl.web_acl_virginia]
 }
 
 module "alb_oregon" {
@@ -277,7 +277,7 @@ module "alb_oregon" {
   }
   name                       = "alb-oregon"
   internal                   = false
-  security_groups = [aws_security_group.alb_sg_oregon.id]
+  security_groups            = [aws_security_group.alb_sg_oregon.id]
   subnets                    = module.vpc_oregon.public_subnets
   enable_deletion_protection = false
   target_group_name          = "tg-oregon"
@@ -295,7 +295,7 @@ resource "aws_wafv2_web_acl_association" "web_acl_association_oregon" {
   provider     = aws.oregon
   resource_arn = module.alb_oregon.alb_arn
   web_acl_arn  = aws_wafv2_web_acl.web_acl_oregon.arn
-  depends_on = [module.alb_oregon, aws_wafv2_web_acl.web_acl_oregon]
+  depends_on   = [module.alb_oregon, aws_wafv2_web_acl.web_acl_oregon]
 }
 /* Security Groups */
 resource "aws_security_group" "alb_sg_virginia" {
@@ -305,16 +305,16 @@ resource "aws_security_group" "alb_sg_virginia" {
   vpc_id      = module.vpc_virginia.vpc_id
 
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -330,16 +330,16 @@ resource "aws_security_group" "alb_sg_oregon" {
   vpc_id      = module.vpc_oregon.vpc_id
 
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -347,199 +347,6 @@ resource "aws_security_group" "alb_sg_oregon" {
     Name = "ALB Security Group Oregon"
   }
 }
-
-/*resource "aws_security_group" "instance_sg_virginia" {
-  provider = aws.virginia
-  name        = "instance_sg_virginia"
-  description = "Allow HTTP and SSH traffic"
-  vpc_id   = module.vpc_virginia.vpc_id
-
-  ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    //security_groups = [aws_security_group.alb_sg_virginia.id]
-  }
-
-  egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "Instance Security Group Virginia"
-  }
-}*/
-
-/*resource "aws_security_group" "instance_sg_oregon" {
-  provider = aws.oregon
-  name        = "instance_sg_oregon"
-  description = "Allow HTTP and SSH traffic"
-  vpc_id   = module.vpc_oregon.vpc_id
-
-  ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "Instance Security Group Oregon"
-  }
-}*/
-
-resource "aws_security_group" "bastion_sg_virginia" {
-  provider    = aws.virginia
-  name        = "bastion_sg_virginia"
-  description = "Allow SSH traffic"
-  vpc_id      = module.vpc_virginia.vpc_id
-
-  ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "Bastion SG Virginia"
-  }
-}
-
-resource "aws_security_group" "bastion_sg_oregon" {
-  provider    = aws.oregon
-  name        = "oregon_sg_virginia"
-  description = "Allow SSH traffic"
-  vpc_id      = module.vpc_oregon.vpc_id
-
-  ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "Bastion SG Oregon"
-  }
-}
-
-resource "aws_security_group" "gitlab_sg_virginia" {
-  provider    = aws.virginia
-  name        = "gitlab_sg_virginia"
-  description = "Allow HTTP, HTTPS and SSH traffic"
-  vpc_id      = module.vpc_virginia.vpc_id
-
-  ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    security_groups = [aws_security_group.alb_sg_virginia.id]
-  }
-
-  ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  tags = {
-    Name = "GitLab SG Virginia"
-  }
-}
-
-resource "aws_security_group" "gitlab_sg_oregon" {
-  provider    = aws.oregon
-  name        = "gitlab_sg_oregon"
-  description = "Allow HTTP, HTTPS and SSH traffic"
-  vpc_id      = module.vpc_oregon.vpc_id
-
-  ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  tags = {
-    Name = "GitLab SG Oregon"
-  }
-}
-/* Security Groups*/
 /* IAM Role and Instance Profile */
 resource "aws_iam_role" "ssm_role" {
   provider = aws.virginia
@@ -572,86 +379,38 @@ resource "aws_iam_instance_profile" "ssm_instance_profile" {
   role     = aws_iam_role.ssm_role.name
 }
 /* IAM Role and Instance Profile */
-/*module "web_instance_virginia" {
-  source = "./modules/ec2"
-  providers = {
-    aws = aws.virginia
-  }
-  ami             = "ami-04e8b3e527208c8cf"
-  instance_type   = "t2.micro"
-  instance_volume = "40"
-  subnet_id       = module.vpc_virginia.private_subnets[0]
-  key_name        = "BaseKeyAcces"
-  security_group_ids = [aws_security_group.instance_sg_virginia.id]
-  user_data = templatefile("${path.module}/scripts/web_instance_data.sh", {
-    region = "Virginia"
-  })
-  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
-  tags = {
-    Name = "WebInstanceVirginia"
-  }
-  depends_on = [aws_security_group.instance_sg_virginia, aws_iam_instance_profile.ssm_instance_profile]
-}*/
-
-/*resource "aws_lb_target_group_attachment" "virginia" {
-  provider         = aws.virginia
-  target_group_arn = module.alb_virginia.target_group_arn
-  target_id        = module.web_instance_virginia.instance_id
-  port             = 80
-}*/
-
-/*resource "aws_route53_record" "virginia" {
-  provider = aws.route53
-  zone_id  = "Z07774303G2AYPCGKGZSX"
-  name     = "test.isolated-virginia.kubixcorp.com"
-  type     = "CNAME"
-  ttl      = 300
-  records = [module.alb_virginia.alb_dns_name]
-}
-*/
-/*module "web_instance_oregon" {
-  source = "./modules/ec2"
-  providers = {
-    aws = aws.oregon
-  }
-  ami             = "ami-0676a735c5f8e67c4"
-  instance_type   = "t2.micro"
-  instance_volume = "40"
-  subnet_id       = module.vpc_oregon.private_subnets[0]
-  key_name        = "BaseKeyAcces"
-  security_group_ids = [aws_security_group.instance_sg_oregon.id]
-  user_data = templatefile("${path.module}/scripts/web_instance_data.sh", {
-    region = "Oregon"
-  })
-  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
-  tags = {
-    Name = "WebInstanceOregon"
-  }
-  depends_on = [aws_security_group.instance_sg_oregon, aws_iam_instance_profile.ssm_instance_profile]
-}*/
-
-/*resource "aws_lb_target_group_attachment" "oregon" {
-  provider         = aws.oregon
-  target_group_arn = module.alb_oregon.target_group_arn
-  target_id        = module.web_instance_oregon.instance_id
-  port             = 80
-}*/
-
-/*resource "aws_route53_record" "oregon" {
-  provider = aws.route53
-  zone_id  = "Z07774303G2AYPCGKGZSX"
-  name     = "test.isolated-oregon.kubixcorp.com"
-  type     = "CNAME"
-  ttl      = 300
-  records = [module.alb_oregon.alb_dns_name]
-}*/
 /* Instances Bastion Virginia */
+resource "aws_security_group" "bastion_sg_virginia" {
+  provider    = aws.virginia
+  name        = "bastion_sg_virginia"
+  description = "Allow SSH traffic"
+  vpc_id      = module.vpc_virginia.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "Bastion SG Virginia"
+  }
+}
+
 resource "aws_instance" "bastion_virginia" {
-  provider      = aws.virginia
-  ami           = "ami-04e8b3e527208c8cf"
-  instance_type = "t2.micro"
-  subnet_id     = module.vpc_virginia.public_subnets[0]
-  key_name      = "BaseKeyAcces"
+  provider               = aws.virginia
+  ami                    = "ami-04e8b3e527208c8cf"
+  instance_type          = "t2.micro"
+  subnet_id              = module.vpc_virginia.public_subnets[0]
+  key_name               = "BaseKeyAcces"
   vpc_security_group_ids = [aws_security_group.bastion_sg_virginia.id]
   user_data = templatefile("${path.module}/scripts/networks_utils.sh", {
     region = "Virginia"
@@ -662,13 +421,39 @@ resource "aws_instance" "bastion_virginia" {
   }
   depends_on = [aws_security_group.bastion_sg_virginia, aws_iam_instance_profile.ssm_instance_profile]
 }
+/* Instances Bastion Virginia */
+/* Instances Bastion Oregon */
+resource "aws_security_group" "bastion_sg_oregon" {
+  provider    = aws.oregon
+  name        = "oregon_sg_virginia"
+  description = "Allow SSH traffic"
+  vpc_id      = module.vpc_oregon.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "Bastion SG Oregon"
+  }
+}
 
 resource "aws_instance" "bastion_oregon" {
-  provider      = aws.oregon
-  ami           = "ami-0676a735c5f8e67c4"
-  instance_type = "t2.micro"
-  subnet_id     = module.vpc_oregon.public_subnets[0]
-  key_name      = "BaseKeyAcces"
+  provider               = aws.oregon
+  ami                    = "ami-0676a735c5f8e67c4"
+  instance_type          = "t2.micro"
+  subnet_id              = module.vpc_oregon.public_subnets[0]
+  key_name               = "BaseKeyAcces"
   vpc_security_group_ids = [aws_security_group.bastion_sg_oregon.id]
   user_data = templatefile("${path.module}/scripts/networks_utils.sh", {
     region = "Oregon"
@@ -679,14 +464,54 @@ resource "aws_instance" "bastion_oregon" {
   }
   depends_on = [aws_security_group.bastion_sg_oregon, aws_iam_instance_profile.ssm_instance_profile]
 }
-/* Instances Bastion Virginia */
+/* Instances Bastion Oregon */
 /* GitLab Virginia */
+resource "aws_security_group" "gitlab_sg_virginia" {
+  provider    = aws.virginia
+  name        = "gitlab_sg_virginia"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_virginia.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "GitLab SG Virginia"
+  }
+}
+
 resource "aws_instance" "gitlab_virginia" {
-  provider      = aws.virginia
-  ami           = "ami-0c2926c986c7eb348"
-  instance_type = "c5.xlarge"
-  key_name      = "BaseKeyAcces"
-  subnet_id     = module.vpc_virginia.public_subnets[0]
+  provider               = aws.virginia
+  ami                    = "ami-0c2926c986c7eb348"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_virginia.public_subnets[0]
   vpc_security_group_ids = [aws_security_group.gitlab_sg_virginia.id]
   user_data = templatefile("${path.module}/scripts/gitlab_utils.sh", {
     region = "Virginia"
@@ -719,7 +544,7 @@ resource "aws_lb_target_group" "gitlab_tg_virginia" {
 
 resource "aws_lb_listener_rule" "gitlab_rule_virginia" {
   provider     = aws.virginia
-  tags = { Name = "gitlab_rule_virginia" }
+  tags         = { Name = "gitlab_rule_virginia" }
   listener_arn = module.alb_virginia.alb_listener_https_arn
   priority     = 20
 
@@ -740,7 +565,7 @@ resource "aws_lb_target_group_attachment" "gitlab_attachment_virginia" {
   target_group_arn = aws_lb_target_group.gitlab_tg_virginia.arn
   target_id        = aws_instance.gitlab_virginia.id
   port             = 80
-  depends_on = [aws_lb_target_group.gitlab_tg_virginia, aws_instance.gitlab_virginia]
+  depends_on       = [aws_lb_target_group.gitlab_tg_virginia, aws_instance.gitlab_virginia]
 }
 
 resource "aws_route53_record" "gitlab_dns_virginia" {
@@ -756,12 +581,52 @@ resource "aws_route53_record" "gitlab_dns_virginia" {
 }
 /* GitLab Virginia */
 /* GitLab Oregon */
+resource "aws_security_group" "gitlab_sg_oregon" {
+  provider    = aws.oregon
+  name        = "gitlab_sg_oregon"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_oregon.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "GitLab SG Oregon"
+  }
+}
+
 resource "aws_instance" "gitlab_oregon" {
-  provider      = aws.oregon
-  ami           = "ami-0e6cc701211a663f2"
-  instance_type = "c5.xlarge"
-  key_name      = "BaseKeyAcces"
-  subnet_id     = module.vpc_oregon.public_subnets[0]
+  provider               = aws.oregon
+  ami                    = "ami-0e6cc701211a663f2"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_oregon.public_subnets[0]
   vpc_security_group_ids = [aws_security_group.gitlab_sg_oregon.id]
   user_data = templatefile("${path.module}/scripts/gitlab_utils.sh", {
     region = "Oregon"
@@ -794,7 +659,7 @@ resource "aws_lb_target_group" "gitlab_tg_oregon" {
 
 resource "aws_lb_listener_rule" "gitlab_rule_oregon" {
   provider     = aws.oregon
-  tags = { Name = "gitlab_rule_oregon" }
+  tags         = { Name = "gitlab_rule_oregon" }
   listener_arn = module.alb_oregon.alb_listener_https_arn
   priority     = 20
 
@@ -815,7 +680,7 @@ resource "aws_lb_target_group_attachment" "gitlab_attachment_oregon" {
   target_group_arn = aws_lb_target_group.gitlab_tg_oregon.arn
   target_id        = aws_instance.gitlab_oregon.id
   port             = 80
-  depends_on = [aws_lb_target_group.gitlab_tg_oregon, aws_instance.gitlab_oregon]
+  depends_on       = [aws_lb_target_group.gitlab_tg_oregon, aws_instance.gitlab_oregon]
 }
 
 resource "aws_route53_record" "gitlab_dns_oregon" {
@@ -830,6 +695,1384 @@ resource "aws_route53_record" "gitlab_dns_oregon" {
   }
 }
 /* GitLab Oregon */
+/* Jasper Virginia */
+resource "aws_security_group" "jasper_sg_virginia" {
+  provider    = aws.virginia
+  name        = "jasper_sg_virginia"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_virginia.vpc_id
 
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
 
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "Jasper SG Virginia"
+  }
+}
+
+resource "aws_instance" "jasper_virginia" {
+  provider               = aws.virginia
+  ami                    = "ami-04e8b3e527208c8cf"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_virginia.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.jasper_sg_virginia.id]
+  user_data = templatefile("${path.module}/scripts/jasper_utils.sh", {
+    region = "Virginia"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 40
+  }
+
+  tags = {
+    Name = "Jasper Virginia"
+  }
+  depends_on = [aws_security_group.jasper_sg_virginia, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_lb_target_group" "jasper_tg_virginia" {
+  name     = "jasper-tg-virginia"
+  provider = aws.virginia
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_virginia.vpc_id
+  health_check {
+    path     = "/"
+    interval = 30
+    timeout  = 5
+    matcher  = "200"
+  }
+}
+
+resource "aws_lb_listener_rule" "jasper_rule_virginia" {
+  provider     = aws.virginia
+  tags         = { Name = "jasper_rule_virginia" }
+  listener_arn = module.alb_virginia.alb_listener_https_arn
+  priority     = 19
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.jasper_tg_virginia.arn
+  }
+
+  condition {
+    host_header {
+      values = ["reports.isolated-virginia.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "jasper_attachment_virginia" {
+  provider         = aws.virginia
+  target_group_arn = aws_lb_target_group.jasper_tg_virginia.arn
+  target_id        = aws_instance.jasper_virginia.id
+  port             = 80
+  depends_on       = [aws_lb_target_group.jasper_tg_virginia, aws_instance.jasper_virginia]
+}
+
+resource "aws_route53_record" "jasper_dns_virginia" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "reports.isolated-virginia.kubixcorp.com"
+  type     = "A"
+  alias {
+    name                   = module.alb_virginia.alb_dns_name
+    zone_id                = module.alb_virginia.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+/* Jasper Virginia */
+/* Jasper Oregon */
+resource "aws_security_group" "jasper_sg_oregon" {
+  provider    = aws.oregon
+  name        = "jasper_sg_oregon"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_oregon.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "Jasper SG Oregon"
+  }
+}
+
+resource "aws_instance" "jasper_oregon" {
+  provider               = aws.oregon
+  ami                    = "ami-0676a735c5f8e67c4"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_oregon.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.jasper_sg_oregon.id]
+  user_data = templatefile("${path.module}/scripts/jasper_utils.sh", {
+    region = "Oregon"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 40
+  }
+
+  tags = {
+    Name = "Jasper Oregon"
+  }
+  depends_on = [aws_security_group.jasper_sg_oregon, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_lb_target_group" "jasper_tg_oregon" {
+  name     = "jasper-tg-oregon"
+  provider = aws.oregon
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_oregon.vpc_id
+  health_check {
+    path     = "/"
+    interval = 30
+    timeout  = 5
+    matcher  = "200"
+  }
+}
+
+resource "aws_lb_listener_rule" "jasper_rule_oregon" {
+  provider     = aws.oregon
+  tags         = { Name = "jasper_rule_oregon" }
+  listener_arn = module.alb_oregon.alb_listener_https_arn
+  priority     = 19
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.jasper_tg_oregon.arn
+  }
+
+  condition {
+    host_header {
+      values = ["reports.isolated-oregon.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "jasper_attachment_oregon" {
+  provider         = aws.oregon
+  target_group_arn = aws_lb_target_group.jasper_tg_oregon.arn
+  target_id        = aws_instance.jasper_oregon.id
+  port             = 80
+  depends_on       = [aws_lb_target_group.jasper_tg_oregon, aws_instance.jasper_oregon]
+}
+
+resource "aws_route53_record" "jasper_dns_oregon" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "reports.isolated-oregon.kubixcorp.com"
+  type     = "A"
+  alias {
+    name                   = module.alb_oregon.alb_dns_name
+    zone_id                = module.alb_oregon.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+/* Jasper Oregon */
+/* Pentaho Virginia */
+resource "aws_security_group" "pentaho_sg_virginia" {
+  provider    = aws.virginia
+  name        = "pentaho_sg_virginia"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_virginia.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "Pentaho SG Virginia"
+  }
+}
+
+resource "aws_instance" "pentaho_virginia" {
+  provider               = aws.virginia
+  ami                    = "ami-04e8b3e527208c8cf"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_virginia.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.pentaho_sg_virginia.id]
+  user_data = templatefile("${path.module}/scripts/pentaho_utils.sh", {
+    region = "Virginia"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 40
+  }
+
+  tags = {
+    Name = "Pentaho Virginia"
+  }
+  depends_on = [aws_security_group.pentaho_sg_virginia, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_lb_target_group" "pentaho_tg_virginia" {
+  name     = "pentaho-tg-virginia"
+  provider = aws.virginia
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_virginia.vpc_id
+  health_check {
+    path     = "/"
+    interval = 30
+    timeout  = 5
+    matcher  = "200"
+  }
+}
+
+resource "aws_lb_listener_rule" "pentaho_rule_virginia" {
+  provider     = aws.virginia
+  tags         = { Name = "pentaho_rule_virginia" }
+  listener_arn = module.alb_virginia.alb_listener_https_arn
+  priority     = 18
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.pentaho_tg_virginia.arn
+  }
+
+  condition {
+    host_header {
+      values = ["pentaho.isolated-virginia.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "pentaho_attachment_virginia" {
+  provider         = aws.virginia
+  target_group_arn = aws_lb_target_group.pentaho_tg_virginia.arn
+  target_id        = aws_instance.pentaho_virginia.id
+  port             = 80
+  depends_on       = [aws_lb_target_group.pentaho_tg_virginia, aws_instance.pentaho_virginia]
+}
+
+resource "aws_route53_record" "pentaho_dns_virginia" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "pentaho.isolated-virginia.kubixcorp.com"
+  type     = "A"
+  alias {
+    name                   = module.alb_virginia.alb_dns_name
+    zone_id                = module.alb_virginia.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+/* Pentaho Virginia */
+/* Pentaho Oregon */
+resource "aws_security_group" "pentaho_sg_oregon" {
+  provider    = aws.oregon
+  name        = "pentaho_sg_oregon"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_oregon.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "Pentaho SG Oregon"
+  }
+}
+
+resource "aws_instance" "pentaho_oregon" {
+  provider               = aws.oregon
+  ami                    = "ami-0676a735c5f8e67c4"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_oregon.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.pentaho_sg_oregon.id]
+  user_data = templatefile("${path.module}/scripts/pentaho_utils.sh", {
+    region = "Oregon"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 40
+  }
+
+  tags = {
+    Name = "Pentaho Oregon"
+  }
+  depends_on = [aws_security_group.pentaho_sg_oregon, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_lb_target_group" "pentaho_tg_oregon" {
+  name     = "pentaho-tg-oregon"
+  provider = aws.oregon
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_oregon.vpc_id
+  health_check {
+    path     = "/"
+    interval = 30
+    timeout  = 5
+    matcher  = "200"
+  }
+}
+
+resource "aws_lb_listener_rule" "pentaho_rule_oregon" {
+  provider     = aws.oregon
+  tags         = { Name = "pentaho_rule_oregon" }
+  listener_arn = module.alb_oregon.alb_listener_https_arn
+  priority     = 18
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.pentaho_tg_oregon.arn
+  }
+
+  condition {
+    host_header {
+      values = ["pentaho.isolated-oregon.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "pentaho_attachment_oregon" {
+  provider         = aws.oregon
+  target_group_arn = aws_lb_target_group.pentaho_tg_oregon.arn
+  target_id        = aws_instance.pentaho_oregon.id
+  port             = 80
+  depends_on       = [aws_lb_target_group.pentaho_tg_oregon, aws_instance.pentaho_oregon]
+}
+
+resource "aws_route53_record" "pentaho_dns_oregon" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "pentaho.isolated-oregon.kubixcorp.com"
+  type     = "A"
+  alias {
+    name                   = module.alb_oregon.alb_dns_name
+    zone_id                = module.alb_oregon.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+/* Pentaho Oregon */
+/* SonarQube Virginia */
+resource "aws_security_group" "sonarqube_sg_virginia" {
+  provider    = aws.virginia
+  name        = "sonarqube_sg_virginia"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_virginia.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "SonarQube SG Virginia"
+  }
+}
+
+resource "aws_instance" "sonarqube_virginia" {
+  provider               = aws.virginia
+  ami                    = "ami-04e8b3e527208c8cf"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_virginia.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.sonarqube_sg_virginia.id]
+  user_data = templatefile("${path.module}/scripts/sonarqube_utils.sh", {
+    region = "Virginia"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 40
+  }
+
+  tags = {
+    Name = "SonarQube Virginia"
+  }
+  depends_on = [aws_security_group.sonarqube_sg_virginia, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_lb_target_group" "sonarqube_tg_virginia" {
+  name     = "sonarqube-tg-virginia"
+  provider = aws.virginia
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_virginia.vpc_id
+  health_check {
+    path     = "/"
+    interval = 30
+    timeout  = 5
+    matcher  = "200"
+  }
+}
+
+resource "aws_lb_listener_rule" "sonarqube_rule_virginia" {
+  provider     = aws.virginia
+  tags         = { Name = "sonarqube_rule_virginia" }
+  listener_arn = module.alb_virginia.alb_listener_https_arn
+  priority     = 17
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.sonarqube_tg_virginia.arn
+  }
+
+  condition {
+    host_header {
+      values = ["sonarqube.isolated-virginia.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "sonarqube_attachment_virginia" {
+  provider         = aws.virginia
+  target_group_arn = aws_lb_target_group.sonarqube_tg_virginia.arn
+  target_id        = aws_instance.sonarqube_virginia.id
+  port             = 80
+  depends_on       = [aws_lb_target_group.sonarqube_tg_virginia, aws_instance.sonarqube_virginia]
+}
+
+resource "aws_route53_record" "sonarqube_dns_virginia" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "sonarqube.isolated-virginia.kubixcorp.com"
+  type     = "A"
+  alias {
+    name                   = module.alb_virginia.alb_dns_name
+    zone_id                = module.alb_virginia.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+/* SonarQube Virginia */
+/* SonarQube Oregon */
+resource "aws_security_group" "sonarqube_sg_oregon" {
+  provider    = aws.oregon
+  name        = "sonarqube_sg_oregon"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_oregon.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "SonarQube SG Oregon"
+  }
+}
+
+resource "aws_instance" "sonarqube_oregon" {
+  provider               = aws.oregon
+  ami                    = "ami-0676a735c5f8e67c4"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_oregon.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.sonarqube_sg_oregon.id]
+  user_data = templatefile("${path.module}/scripts/sonarqube_utils.sh", {
+    region = "Oregon"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 40
+  }
+
+  tags = {
+    Name = "SonarQube Oregon"
+  }
+  depends_on = [aws_security_group.sonarqube_sg_oregon, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_lb_target_group" "sonarqube_tg_oregon" {
+  name     = "sonarqube-tg-oregon"
+  provider = aws.oregon
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_oregon.vpc_id
+  health_check {
+    path     = "/"
+    interval = 30
+    timeout  = 5
+    matcher  = "200"
+  }
+}
+
+resource "aws_lb_listener_rule" "sonarqube_rule_oregon" {
+  provider     = aws.oregon
+  tags         = { Name = "sonarqube_rule_oregon" }
+  listener_arn = module.alb_oregon.alb_listener_https_arn
+  priority     = 17
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.sonarqube_tg_oregon.arn
+  }
+
+  condition {
+    host_header {
+      values = ["sonarqube.isolated-oregon.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "sonarqube_attachment_oregon" {
+  provider         = aws.oregon
+  target_group_arn = aws_lb_target_group.sonarqube_tg_oregon.arn
+  target_id        = aws_instance.sonarqube_oregon.id
+  port             = 80
+  depends_on       = [aws_lb_target_group.sonarqube_tg_oregon, aws_instance.sonarqube_oregon]
+}
+
+resource "aws_route53_record" "sonarqube_dns_oregon" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "sonarqube.isolated-oregon.kubixcorp.com"
+  type     = "A"
+  alias {
+    name                   = module.alb_oregon.alb_dns_name
+    zone_id                = module.alb_oregon.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+/* SonarQube Oregon */
+/* Monitor Virginia */
+resource "aws_security_group" "monitor_sg_virginia" {
+  provider    = aws.virginia
+  name        = "monitor_sg_virginia"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_virginia.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "Monitor SG Virginia"
+  }
+}
+
+resource "aws_instance" "monitor_virginia" {
+  provider               = aws.virginia
+  ami                    = "ami-09634e8f6f4163b0e"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_virginia.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.monitor_sg_virginia.id]
+  user_data = templatefile("${path.module}/scripts/monitor_utils.sh", {
+    region = "Virginia"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 40
+  }
+
+  tags = {
+    Name = "Monitor Virginia"
+  }
+  depends_on = [aws_security_group.monitor_sg_virginia, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_lb_target_group" "monitor_tg_virginia" {
+  name     = "monitor-tg-virginia"
+  provider = aws.virginia
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_virginia.vpc_id
+  health_check {
+    path     = "/"
+    interval = 30
+    timeout  = 5
+    matcher  = "200"
+  }
+}
+
+resource "aws_lb_listener_rule" "monitor_rule_virginia" {
+  provider     = aws.virginia
+  tags         = { Name = "monitor_rule_virginia" }
+  listener_arn = module.alb_virginia.alb_listener_https_arn
+  priority     = 16
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.monitor_tg_virginia.arn
+  }
+
+  condition {
+    host_header {
+      values = ["monitor.isolated-virginia.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "monitor_attachment_virginia" {
+  provider         = aws.virginia
+  target_group_arn = aws_lb_target_group.monitor_tg_virginia.arn
+  target_id        = aws_instance.monitor_virginia.id
+  port             = 80
+  depends_on       = [aws_lb_target_group.monitor_tg_virginia, aws_instance.monitor_virginia]
+}
+
+resource "aws_route53_record" "monitor_dns_virginia" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "monitor.isolated-virginia.kubixcorp.com"
+  type     = "A"
+  alias {
+    name                   = module.alb_virginia.alb_dns_name
+    zone_id                = module.alb_virginia.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+/* Monitor Virginia */
+/* Monitor Oregon */
+resource "aws_security_group" "monitor_sg_oregon" {
+  provider    = aws.oregon
+  name        = "monitor_sg_oregon"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_oregon.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "Monitor SG Oregon"
+  }
+}
+
+resource "aws_instance" "monitor_oregon" {
+  provider               = aws.oregon
+  ami                    = "ami-0fff21d6d6b6003b0"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_oregon.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.monitor_sg_oregon.id]
+  user_data = templatefile("${path.module}/scripts/monitor_utils.sh", {
+    region = "Oregon"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 40
+  }
+
+  tags = {
+    Name = "Monitor Oregon"
+  }
+  depends_on = [aws_security_group.monitor_sg_oregon, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_lb_target_group" "monitor_tg_oregon" {
+  name     = "monitor-tg-oregon"
+  provider = aws.oregon
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_oregon.vpc_id
+  health_check {
+    path     = "/"
+    interval = 30
+    timeout  = 5
+    matcher  = "200"
+  }
+}
+
+resource "aws_lb_listener_rule" "monitor_rule_oregon" {
+  provider     = aws.oregon
+  tags         = { Name = "monitor_rule_oregon" }
+  listener_arn = module.alb_oregon.alb_listener_https_arn
+  priority     = 16
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.monitor_tg_oregon.arn
+  }
+
+  condition {
+    host_header {
+      values = ["monitor.isolated-oregon.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "monitor_attachment_oregon" {
+  provider         = aws.oregon
+  target_group_arn = aws_lb_target_group.monitor_tg_oregon.arn
+  target_id        = aws_instance.monitor_oregon.id
+  port             = 80
+  depends_on       = [aws_lb_target_group.monitor_tg_oregon, aws_instance.monitor_oregon]
+}
+
+resource "aws_route53_record" "monitor_dns_oregon" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "monitor.isolated-oregon.kubixcorp.com"
+  type     = "A"
+  alias {
+    name                   = module.alb_oregon.alb_dns_name
+    zone_id                = module.alb_oregon.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+/* Monitor Oregon */
+/* OpenVPN Virginia */
+resource "aws_security_group" "openvpn_sg_virginia" {
+  provider    = aws.virginia
+  name        = "openvpn_sg_virginia"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_virginia.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "OpenVPN SG Virginia"
+  }
+}
+
+resource "aws_instance" "openvpn_virginia" {
+  provider               = aws.virginia
+  ami                    = "ami-095f86ec226de8b8e"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_virginia.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.openvpn_sg_virginia.id]
+  user_data = templatefile("${path.module}/scripts/openvpn_utils.sh", {
+    region = "Virginia"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 40
+  }
+
+  tags = {
+    Name = "OpenVPN Virginia"
+  }
+  depends_on = [aws_security_group.openvpn_sg_virginia, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_lb_target_group" "openvpn_tg_virginia" {
+  name     = "openvpn-tg-virginia"
+  provider = aws.virginia
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_virginia.vpc_id
+  health_check {
+    path     = "/"
+    interval = 30
+    timeout  = 5
+    matcher  = "200"
+  }
+}
+
+resource "aws_lb_listener_rule" "openvpn_rule_virginia" {
+  provider     = aws.virginia
+  tags         = { Name = "openvpn_rule_virginia" }
+  listener_arn = module.alb_virginia.alb_listener_https_arn
+  priority     = 15
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.openvpn_tg_virginia.arn
+  }
+
+  condition {
+    host_header {
+      values = ["openvpn.isolated-virginia.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "openvpn_attachment_virginia" {
+  provider         = aws.virginia
+  target_group_arn = aws_lb_target_group.openvpn_tg_virginia.arn
+  target_id        = aws_instance.openvpn_virginia.id
+  port             = 80
+  depends_on       = [aws_lb_target_group.openvpn_tg_virginia, aws_instance.openvpn_virginia]
+}
+
+resource "aws_route53_record" "openvpn_dns_virginia" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "openvpn.isolated-virginia.kubixcorp.com"
+  type     = "A"
+  alias {
+    name                   = module.alb_virginia.alb_dns_name
+    zone_id                = module.alb_virginia.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+/* OpenVPN Virginia */
+/* OpenVPN Oregon */
+resource "aws_security_group" "openvpn_sg_oregon" {
+  provider    = aws.oregon
+  name        = "openvpn_sg_oregon"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_oregon.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "OpenVPN SG Oregon"
+  }
+}
+
+resource "aws_instance" "openvpn_oregon" {
+  provider               = aws.oregon
+  ami                    = "ami-0ad3f99eafc4c44f4"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_oregon.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.openvpn_sg_oregon.id]
+  user_data = templatefile("${path.module}/scripts/openvpn_utils.sh", {
+    region = "Oregon"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 40
+  }
+
+  tags = {
+    Name = "OpenVPN Oregon"
+  }
+  depends_on = [aws_security_group.openvpn_sg_oregon, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_lb_target_group" "openvpn_tg_oregon" {
+  name     = "openvpn-tg-oregon"
+  provider = aws.oregon
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_oregon.vpc_id
+  health_check {
+    path     = "/"
+    interval = 30
+    timeout  = 5
+    matcher  = "200"
+  }
+}
+
+resource "aws_lb_listener_rule" "openvpn_rule_oregon" {
+  provider     = aws.oregon
+  tags         = { Name = "openvpn_rule_oregon" }
+  listener_arn = module.alb_oregon.alb_listener_https_arn
+  priority     = 15
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.openvpn_tg_oregon.arn
+  }
+
+  condition {
+    host_header {
+      values = ["openvpn.isolated-oregon.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "openvpn_attachment_oregon" {
+  provider         = aws.oregon
+  target_group_arn = aws_lb_target_group.openvpn_tg_oregon.arn
+  target_id        = aws_instance.openvpn_oregon.id
+  port             = 80
+  depends_on       = [aws_lb_target_group.openvpn_tg_oregon, aws_instance.openvpn_oregon]
+}
+
+resource "aws_route53_record" "openvpn_dns_oregon" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "openvpn.isolated-oregon.kubixcorp.com"
+  type     = "A"
+  alias {
+    name                   = module.alb_oregon.alb_dns_name
+    zone_id                = module.alb_oregon.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+/* OpenVPN Oregon */
+
+/* Tickets Virginia */
+resource "aws_security_group" "tickets_sg_virginia" {
+  provider    = aws.virginia
+  name        = "tickets_sg_virginia"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_virginia.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_virginia.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "Tickets SG Virginia"
+  }
+}
+
+resource "aws_instance" "tickets_virginia" {
+  provider               = aws.virginia
+  ami                    = "ami-04e8b3e527208c8cf"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_virginia.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.tickets_sg_virginia.id]
+  user_data = templatefile("${path.module}/scripts/tickets_utils.sh", {
+    region = "Virginia"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 40
+  }
+
+  tags = {
+    Name = "Tickets Virginia"
+  }
+  depends_on = [aws_security_group.tickets_sg_virginia, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_lb_target_group" "tickets_tg_virginia" {
+  name     = "tickets-tg-virginia"
+  provider = aws.virginia
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_virginia.vpc_id
+  health_check {
+    path     = "/"
+    interval = 30
+    timeout  = 5
+    matcher  = "200"
+  }
+}
+
+resource "aws_lb_listener_rule" "tickets_rule_virginia" {
+  provider     = aws.virginia
+  tags         = { Name = "tickets_rule_virginia" }
+  listener_arn = module.alb_virginia.alb_listener_https_arn
+  priority     = 14
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tickets_tg_virginia.arn
+  }
+
+  condition {
+    host_header {
+      values = ["tickets.isolated-virginia.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "tickets_attachment_virginia" {
+  provider         = aws.virginia
+  target_group_arn = aws_lb_target_group.tickets_tg_virginia.arn
+  target_id        = aws_instance.tickets_virginia.id
+  port             = 80
+  depends_on       = [aws_lb_target_group.tickets_tg_virginia, aws_instance.tickets_virginia]
+}
+
+resource "aws_route53_record" "tickets_dns_virginia" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "tickets.isolated-virginia.kubixcorp.com"
+  type     = "A"
+  alias {
+    name                   = module.alb_virginia.alb_dns_name
+    zone_id                = module.alb_virginia.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+/* Tickets Virginia */
+/* Tickets Oregon */
+resource "aws_security_group" "tickets_sg_oregon" {
+  provider    = aws.oregon
+  name        = "tickets_sg_oregon"
+  description = "Allow HTTP, HTTPS and SSH traffic"
+  vpc_id      = module.vpc_oregon.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    //cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb_sg_oregon.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "Tickets SG Oregon"
+  }
+}
+
+resource "aws_instance" "tickets_oregon" {
+  provider               = aws.oregon
+  ami                    = "ami-0676a735c5f8e67c4"
+  instance_type          = "c5.xlarge"
+  key_name               = "BaseKeyAcces"
+  subnet_id              = module.vpc_oregon.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.tickets_sg_oregon.id]
+  user_data = templatefile("${path.module}/scripts/tickets_utils.sh", {
+    region = "Oregon"
+  })
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 40
+  }
+
+  tags = {
+    Name = "Tickets Oregon"
+  }
+  depends_on = [aws_security_group.tickets_sg_oregon, aws_iam_instance_profile.ssm_instance_profile]
+}
+
+resource "aws_lb_target_group" "tickets_tg_oregon" {
+  name     = "tickets-tg-oregon"
+  provider = aws.oregon
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.vpc_oregon.vpc_id
+  health_check {
+    path     = "/"
+    interval = 30
+    timeout  = 5
+    matcher  = "200"
+  }
+}
+
+resource "aws_lb_listener_rule" "tickets_rule_oregon" {
+  provider     = aws.oregon
+  tags         = { Name = "tickets_rule_oregon" }
+  listener_arn = module.alb_oregon.alb_listener_https_arn
+  priority     = 14
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tickets_tg_oregon.arn
+  }
+
+  condition {
+    host_header {
+      values = ["tickets.isolated-oregon.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "tickets_attachment_oregon" {
+  provider         = aws.oregon
+  target_group_arn = aws_lb_target_group.tickets_tg_oregon.arn
+  target_id        = aws_instance.tickets_oregon.id
+  port             = 80
+  depends_on       = [aws_lb_target_group.tickets_tg_oregon, aws_instance.tickets_oregon]
+}
+
+resource "aws_route53_record" "tickets_dns_oregon" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "tickets.isolated-oregon.kubixcorp.com"
+  type     = "A"
+  alias {
+    name                   = module.alb_oregon.alb_dns_name
+    zone_id                = module.alb_oregon.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+/* Tickets Oregon */

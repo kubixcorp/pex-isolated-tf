@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="TemplateDataLanguageMappings">
+    <file url="file://$PROJECT_DIR$/scripts/jasper_utils.sh" dialect="Shell Script" />
+    <file url="file://$PROJECT_DIR$/scripts/monitor_utils.sh" dialect="Shell Script" />
     <file url="file://$PROJECT_DIR$/scripts/networks_utils.sh" dialect="Shell Script" />
+    <file url="file://$PROJECT_DIR$/scripts/openvpn_utils.sh" dialect="Shell Script" />
+    <file url="file://$PROJECT_DIR$/scripts/pentaho_utils.sh" dialect="Shell Script" />
+    <file url="file://$PROJECT_DIR$/scripts/sonarqube_utils.sh" dialect="Shell Script" />
+    <file url="file://$PROJECT_DIR$/scripts/tickets_utils.sh" dialect="Shell Script" />
     <file url="file://$PROJECT_DIR$/scripts/web_instance_data.sh" dialect="Shell Script" />
   </component>
 </project>

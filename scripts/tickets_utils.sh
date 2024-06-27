@@ -13,7 +13,7 @@ sudo systemctl start amazon-ssm-agent
 systemctl start httpd
 systemctl enable httpd
 
-echo "<html><body><h1>Hello, World PENTAHO from ${region}!</h1><p>Current time: $(date)</p></body></html>" > /var/www/html/index.html
+echo "<html><body><h1>Hello, World TICKETS from ${region}!</h1><p>Current time: $(date)</p></body></html>" > /var/www/html/index.html
 
 chown apache:apache /var/www/html/index.html
 
