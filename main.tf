@@ -412,7 +412,7 @@ resource "aws_instance" "bastion_virginia" {
   subnet_id              = module.vpc_virginia.public_subnets[0]
   key_name               = "BaseKeyAcces"
   vpc_security_group_ids = [aws_security_group.bastion_sg_virginia.id]
-  user_data = templatefile("${path.module}/scripts/networks_utils.sh", {
+  user_data = templatefile("${path.module}/scripts/bastion_utils.sh", {
     region = "Virginia"
   })
   iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
@@ -455,7 +455,7 @@ resource "aws_instance" "bastion_oregon" {
   subnet_id              = module.vpc_oregon.public_subnets[0]
   key_name               = "BaseKeyAcces"
   vpc_security_group_ids = [aws_security_group.bastion_sg_oregon.id]
-  user_data = templatefile("${path.module}/scripts/networks_utils.sh", {
+  user_data = templatefile("${path.module}/scripts/bastion_utils.sh", {
     region = "Oregon"
   })
   iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
@@ -710,6 +710,13 @@ resource "aws_security_group" "jasper_sg_virginia" {
   }
 
   ingress {
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
@@ -765,6 +772,7 @@ resource "aws_lb_target_group" "jasper_tg_virginia" {
   protocol = "HTTP"
   vpc_id   = module.vpc_virginia.vpc_id
   health_check {
+    port = "88"
     path     = "/"
     interval = 30
     timeout  = 5
@@ -825,6 +833,13 @@ resource "aws_security_group" "jasper_sg_oregon" {
   }
 
   ingress {
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
@@ -880,6 +895,7 @@ resource "aws_lb_target_group" "jasper_tg_oregon" {
   protocol = "HTTP"
   vpc_id   = module.vpc_oregon.vpc_id
   health_check {
+    port = "88"
     path     = "/"
     interval = 30
     timeout  = 5
@@ -940,6 +956,13 @@ resource "aws_security_group" "pentaho_sg_virginia" {
   }
 
   ingress {
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
@@ -995,6 +1018,7 @@ resource "aws_lb_target_group" "pentaho_tg_virginia" {
   protocol = "HTTP"
   vpc_id   = module.vpc_virginia.vpc_id
   health_check {
+    port = "88"
     path     = "/"
     interval = 30
     timeout  = 5
@@ -1055,6 +1079,13 @@ resource "aws_security_group" "pentaho_sg_oregon" {
   }
 
   ingress {
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
@@ -1110,6 +1141,7 @@ resource "aws_lb_target_group" "pentaho_tg_oregon" {
   protocol = "HTTP"
   vpc_id   = module.vpc_oregon.vpc_id
   health_check {
+    port = "88"
     path     = "/"
     interval = 30
     timeout  = 5
@@ -1170,6 +1202,13 @@ resource "aws_security_group" "sonarqube_sg_virginia" {
   }
 
   ingress {
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
@@ -1225,6 +1264,7 @@ resource "aws_lb_target_group" "sonarqube_tg_virginia" {
   protocol = "HTTP"
   vpc_id   = module.vpc_virginia.vpc_id
   health_check {
+    port = "88"
     path     = "/"
     interval = 30
     timeout  = 5
@@ -1285,6 +1325,13 @@ resource "aws_security_group" "sonarqube_sg_oregon" {
   }
 
   ingress {
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
@@ -1340,6 +1387,7 @@ resource "aws_lb_target_group" "sonarqube_tg_oregon" {
   protocol = "HTTP"
   vpc_id   = module.vpc_oregon.vpc_id
   health_check {
+    port = "88"
     path     = "/"
     interval = 30
     timeout  = 5
@@ -1400,6 +1448,13 @@ resource "aws_security_group" "monitor_sg_virginia" {
   }
 
   ingress {
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
@@ -1455,6 +1510,7 @@ resource "aws_lb_target_group" "monitor_tg_virginia" {
   protocol = "HTTP"
   vpc_id   = module.vpc_virginia.vpc_id
   health_check {
+    port = "88"
     path     = "/"
     interval = 30
     timeout  = 5
@@ -1515,6 +1571,13 @@ resource "aws_security_group" "monitor_sg_oregon" {
   }
 
   ingress {
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
@@ -1570,6 +1633,7 @@ resource "aws_lb_target_group" "monitor_tg_oregon" {
   protocol = "HTTP"
   vpc_id   = module.vpc_oregon.vpc_id
   health_check {
+    port = "88"
     path     = "/"
     interval = 30
     timeout  = 5
@@ -1630,6 +1694,13 @@ resource "aws_security_group" "openvpn_sg_virginia" {
   }
 
   ingress {
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
@@ -1685,6 +1756,7 @@ resource "aws_lb_target_group" "openvpn_tg_virginia" {
   protocol = "HTTP"
   vpc_id   = module.vpc_virginia.vpc_id
   health_check {
+    port = "88"
     path     = "/"
     interval = 30
     timeout  = 5
@@ -1745,6 +1817,13 @@ resource "aws_security_group" "openvpn_sg_oregon" {
   }
 
   ingress {
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
@@ -1800,6 +1879,7 @@ resource "aws_lb_target_group" "openvpn_tg_oregon" {
   protocol = "HTTP"
   vpc_id   = module.vpc_oregon.vpc_id
   health_check {
+    port = "88"
     path     = "/"
     interval = 30
     timeout  = 5
@@ -1861,6 +1941,13 @@ resource "aws_security_group" "tickets_sg_virginia" {
   }
 
   ingress {
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
@@ -1916,6 +2003,7 @@ resource "aws_lb_target_group" "tickets_tg_virginia" {
   protocol = "HTTP"
   vpc_id   = module.vpc_virginia.vpc_id
   health_check {
+    port = "88"
     path     = "/"
     interval = 30
     timeout  = 5
@@ -1976,6 +2064,13 @@ resource "aws_security_group" "tickets_sg_oregon" {
   }
 
   ingress {
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
@@ -2031,6 +2126,7 @@ resource "aws_lb_target_group" "tickets_tg_oregon" {
   protocol = "HTTP"
   vpc_id   = module.vpc_oregon.vpc_id
   health_check {
+    port = "88"
     path     = "/"
     interval = 30
     timeout  = 5

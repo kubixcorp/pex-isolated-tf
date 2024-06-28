@@ -3,22 +3,40 @@
 # Actualizar los paquetes del sistema
 sudo apt-get update -y
 
-# Instalar amazon-ssm-agent, telnet y apache2
-sudo apt-get install -y amazon-ssm-agent telnet apache2
+if ! snap list amazon-ssm-agent > /dev/null 2>&1; then
+  echo "amazon-ssm-agent no está instalado a través de snap. Instalando ahora..."
+  sudo snap install amazon-ssm-agent --classic
+else
+  echo "amazon-ssm-agent ya está instalado. Actualizando ahora..."
+  sudo snap refresh amazon-ssm-agent
+fi
 
-# Habilitar y arrancar el servicio amazon-ssm-agent
-sudo systemctl enable amazon-ssm-agent
-sudo systemctl start amazon-ssm-agent
+sudo systemctl enable snap.amazon-ssm-agent.amazon-ssm-agent.service
+sudo systemctl start snap.amazon-ssm-agent.amazon-ssm-agent.service
 
-# Habilitar y arrancar el servicio apache2
-sudo systemctl start apache2
-sudo systemctl enable apache2
+# Instalar amazon-ssm-agent, telnet y nginx
+sudo apt-get install -y telnet nginx
 
-# Crear una página de bienvenida
-echo "<html><body><h1>Hello, World OPENVPN from ${region}!</h1><p>Current time: $(date)</p></body></html>" | sudo tee /var/www/html/index.html
+sudo systemctl stop nginx
 
-# Establecer permisos para el archivo HTML
-sudo chown www-data:www-data /var/www/html/index.html
+# Deshabilitar cualquier configuración de Nginx que escuche en el puerto 80
+sudo rm -f /etc/nginx/conf.d/default.conf
+
+sudo tee /etc/nginx/conf.d/health_check.conf > /dev/null <<EOF
+server {
+    listen 88;
+    server_name localhost;
+
+    location / {
+        default_type application/json;
+        return 200 '{"status": "ok", "region": "${region}", "current_time": "$(date)"}';
+    }
+}
+EOF
+
+# Habilitar y arrancar el servicio nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
 
 # Instalar Docker usando snap
 if ! snap list docker > /dev/null 2>&1; then
