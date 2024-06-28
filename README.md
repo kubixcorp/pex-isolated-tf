@@ -45,3 +45,12 @@ Recursos Creados
 	•	Conexión de las subnets a sus respectivos Transit Gateways
 	•	Peering entre Transit Gateways:
 	•	Conexión entre TGW-Virginia y TGW-Oregon    
+
+
+DEBUG
+terraform apply -auto-approve -parallelism=5 
+
+export TF_LOG=INFO
+
+export TF_LOG=DEBUG
+terraform apply > terraform-debug.log
