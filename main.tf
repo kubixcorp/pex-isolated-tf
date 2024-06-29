@@ -245,12 +245,12 @@ module "alb_virginia" {
   providers = {
     aws = aws.virginia
   }
-  name                       = "alb-virginia"
+  name                       = "ALB-Main-Virginia"
   internal                   = false
   security_groups = [aws_security_group.alb_sg_virginia.id]
   subnets                    = module.vpc_virginia.public_subnets
   enable_deletion_protection = false
-  target_group_name          = "tg-virginia"
+  target_group_name          = "Main-TGroup-virginia"
   target_group_port          = 80
   vpc_id                     = module.vpc_virginia.vpc_id
   certificate_arn            = var.certificate_arn_virginia
@@ -275,12 +275,12 @@ module "alb_oregon" {
   providers = {
     aws = aws.oregon
   }
-  name                       = "alb-oregon"
+  name                       = "ALB-Main-Oregon"
   internal                   = false
   security_groups = [aws_security_group.alb_sg_oregon.id]
   subnets                    = module.vpc_oregon.public_subnets
   enable_deletion_protection = false
-  target_group_name          = "tg-oregon"
+  target_group_name          = "Main-TGroup-oregon"
   target_group_port          = 80
   vpc_id                     = module.vpc_oregon.vpc_id
   certificate_arn            = var.certificate_arn_oregon
@@ -475,6 +475,7 @@ resource "aws_instance" "bastion_oregon" {
 
 /* Clusters Fargate */
 
+/*IAM Roles and Policies for ECS Fargate*/
 resource "time_sleep" "wait_30_seconds" {
   depends_on = [aws_iam_role.ecs_task_role, aws_iam_role.ecs_task_execution_role]
   create_duration = "15s"
@@ -545,16 +546,58 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+/*IAM Roles and Policies for ECS Fargate*/
+
+/* ECS Fargate */
 resource "aws_ecs_cluster" "ecs_cluster_virginia" {
   provider = aws.virginia
-  count    = 2
-  name     = "${var.environment}-ecs-cluster-virginia-${count.index + 1}"
+  // count    = 2 //Prod-Cluster-Puntoxpress
+  name = "${var.environment_dev}-Prod-Cluster-Puntoxpress"
+}
+
+resource "aws_wafv2_web_acl" "web_acl_ecs_virginia" {
+  provider    = aws.virginia
+  name        = "alb-web-acl-ecs-virginia"
+  scope       = "REGIONAL"
+  description = "Web ACL to allow specific IPs"
+
+  default_action {
+    block {}
+  }
+
+  rule {
+    name     = "allow-specific-ips-ecs-virginia"
+    priority = 1
+
+    action {
+      allow {}
+    }
+
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.allowed_ips_virginia.arn
+      }
+    }
+
+    visibility_config {
+      sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-specific-ips-ecs-virginia"
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "web-acl-metrics-ecs-virginia"
+    sampled_requests_enabled   = true
+  }
+  depends_on = [aws_wafv2_ip_set.allowed_ips_virginia]
 }
 
 resource "aws_lb" "app_lb_virginia" {
-  provider           = aws.virginia
-  count              = 2
-  name               = "${var.environment}-app-lb-virginia-${count.index + 1}"
+  provider = aws.virginia
+  //count              = 2  //Prod-ALB-Puntoxpress
+  name               = "${var.environment_dev}-ALB-Puntoxpress"
   internal           = false
   load_balancer_type = "application"
   security_groups = [aws_security_group.lb_sg_virginia.id]
@@ -562,25 +605,32 @@ resource "aws_lb" "app_lb_virginia" {
 
 }
 
+resource "aws_wafv2_web_acl_association" "web_acl_association_ecs_virginia" {
+  provider     = aws.virginia
+  resource_arn = module.alb_virginia.alb_arn
+  web_acl_arn  = aws_wafv2_web_acl.web_acl_ecs_virginia.arn
+  depends_on = [module.alb_virginia, aws_wafv2_web_acl.web_acl_ecs_virginia]
+}
+
 resource "aws_lb_listener" "https_listener_virginia" {
-  provider          = aws.virginia
-  count             = 2
-  load_balancer_arn = aws_lb.app_lb_virginia[count.index].arn
+  provider = aws.virginia
+  //count             = 2
+  load_balancer_arn = aws_lb.app_lb_virginia.arn
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = var.certificate_arn_virginia
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.app_tg_virginia[count.index].arn
+    target_group_arn = aws_lb_target_group.app_tg_virginia.arn
   }
   depends_on = [aws_lb.app_lb_virginia, aws_lb_target_group.app_tg_virginia]
 }
 
 resource "aws_lb_target_group" "app_tg_virginia" {
-  provider    = aws.virginia
-  count       = 2
-  name        = "${var.environment}-app-tg-virginia${count.index + 1}"
+  provider = aws.virginia
+  //count       = 2 //Prod-TGroup-Puntoxpress
+  name        = "${var.environment_dev}-TGroup-Puntoxpress"
   port        = 80
   protocol    = "HTTP"
   vpc_id      = module.vpc_virginia.vpc_id
@@ -599,7 +649,7 @@ resource "aws_lb_target_group" "app_tg_virginia" {
 
 resource "aws_security_group" "lb_sg_virginia" {
   provider = aws.virginia
-  name     = "${var.environment}-lb-sg-virginia"
+  name     = "${var.environment_dev}-lb-sg-puntoxpress"
   vpc_id   = module.vpc_virginia.vpc_id
 
   ingress {
@@ -626,8 +676,8 @@ resource "aws_security_group" "lb_sg_virginia" {
 
 resource "aws_ecs_task_definition" "task_def_virginia" {
   provider           = aws.virginia
-  count              = 16
-  family             = "${var.environment}-task-def-${count.index + 1}"
+  count              = 8
+  family             = "${var.environment_dev}-task-def-${count.index + 1}"
   network_mode       = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                = "256"
@@ -652,11 +702,11 @@ resource "aws_ecs_task_definition" "task_def_virginia" {
 
 resource "aws_ecs_service" "ecs_service_virginia" {
   provider        = aws.virginia
-  count           = 16
-  name            = "${var.environment}-ecs-service-virginia-${count.index + 1}"
-  cluster = element(aws_ecs_cluster.ecs_cluster_virginia.*.id, count.index < 8 ? 0 : 1)
+  count           = 8
+  name            = "${var.environment_dev}-ecs-service-${count.index + 1}"
+  cluster         = aws_ecs_cluster.ecs_cluster_virginia.id
   task_definition = aws_ecs_task_definition.task_def_virginia[count.index].arn
-  desired_count   = 2
+  desired_count   = 1
   launch_type     = "FARGATE"
   network_configuration {
     subnets          = module.vpc_virginia.public_subnets
@@ -664,9 +714,9 @@ resource "aws_ecs_service" "ecs_service_virginia" {
     assign_public_ip = true
   }
   load_balancer {
-    target_group_arn = element(aws_lb_target_group.app_tg_virginia[*].arn, count.index < 8 ? 0 : 1)
-    container_name = "app"
-    container_port = 80
+    target_group_arn = aws_lb_target_group.app_tg_virginia.arn
+    container_name   = "app"
+    container_port   = 80
   }
   depends_on = [
     aws_lb_listener.https_listener_virginia,
@@ -677,5 +727,48 @@ resource "aws_ecs_service" "ecs_service_virginia" {
   ]
 }
 
+resource "aws_lb_listener_rule" "ecs_rule_virginia" {
+  provider     = aws.virginia
+  count        = 8
+  name         = "ecs_rule_virginia_${count.index + 1}"
+  tags = { Name = "ecs_rule_virginia_${count.index + 1}" }
+  listener_arn = module.alb_virginia.alb_listener_https_arn
+  priority     = 10+count.index
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app_tg_virginia.arn
+  }
+
+  condition {
+    host_header {
+      values = ["srv.isolated-oregon.kubixcorp.com"]
+    }
+  }
+}
+
+resource "aws_lb_target_group_attachment" "ecs_attachment_virginia" {
+  count            = 8
+  provider         = aws.virginia
+  target_group_arn = aws_lb_target_group.app_tg_virginia.arn
+  target_id        = aws_ecs_service.ecs_service_virginia[count.index].id
+  port             = 80
+  depends_on = [aws_lb_target_group.app_tg_virginia, aws_ecs_service.ecs_service_virginia]
+}
+
+resource "aws_route53_record" "tasks_dns_ecs_virginia" {
+  provider = aws.route53
+  zone_id  = "Z07774303G2AYPCGKGZSX"
+  name     = "srv.isolated-virginia.kubixcorp.com"
+  type     = "A"
+
+  alias {
+    name                   = aws_lb.app_lb_virginia.dns_name
+    zone_id                = aws_lb.app_lb_virginia.zone_id
+    evaluate_target_health = true
+  }
+}
+
+/* ECS Fargate */
 
 /* Clusters Fargate */

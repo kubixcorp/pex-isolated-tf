@@ -1,0 +1,179 @@
+
+[0m[1maws_route53_record.tasks_dns_oregon[15]: Creation complete after 55s [id=Z07774303G2AYPCGKGZSX_16.isolated-oregon.kubixcorp.com_A][0m
+2024-06-29T01:09:00.059-0600 [DEBUG] State storage *statemgr.Filesystem declined to persist a state snapshot
+2024-06-29T01:09:00.081-0600 [DEBUG] provider.terraform-provider-aws_v4.67.0_x5: HTTP Request Sent: http.request.body="" net.peer.name=route53.amazonaws.com tf_rpc=ApplyResourceChange aws.region=us-east-1 @caller=github.com/hashicorp/aws-sdk-go-base/v2/awsv1shim/v2@v2.0.0-beta.26/logger.go:90 aws.operation=GetChange http.url=https://route53.amazonaws.com/2013-04-01/change/C01082082OE1Y7PESDEQA http.user_agent="APN/1.0 HashiCorp/1.0 Terraform/1.8.5 (+https://www.terraform.io) terraform-provider-aws/4.67.0 (+https://registry.terraform.io/providers/hashicorp/aws) aws-sdk-go/1.44.261 (go1.19.8; darwin; arm64)" tf_mux_provider="*schema.GRPCProviderServer" tf_resource_type=aws_route53_record http.flavor=1.1 http.method=GET http.request.header.authorization="AWS4-HMAC-SHA256 Credential=AKIA************XUWE/20240629/us-east-1/route53/aws4_request, SignedHeaders=host;x-amz-date, Signature=*****" aws.service="Route 53" http.request.header.x_amz_date=20240629T070900Z tf_provider_addr=registry.terraform.io/hashicorp/aws tf_req_id=99cbdc2f-1c94-ba72-1615-7b0ea4db1b30 @module=aws aws.sdk=aws-sdk-go timestamp=2024-06-29T01:09:00.081-0600
+2024-06-29T01:09:00.237-0600 [DEBUG] provider.terraform-provider-aws_v4.67.0_x5: HTTP Response Received: http.response.header.content_type=text/xml http.response.header.date="Sat, 29 Jun 2024 07:09:00 GMT" tf_req_id=99cbdc2f-1c94-ba72-1615-7b0ea4db1b30 aws.region=us-east-1 aws.sdk=aws-sdk-go aws.service="Route 53" aws.operation=GetChange http.response.header.x_amzn_requestid=cda32303-b016-41fa-910a-30940e5c679a tf_mux_provider="*schema.GRPCProviderServer" tf_resource_type=aws_route53_record tf_rpc=ApplyResourceChange
+  http.response.body=
+  | <?xml version="1.0"?>
+  | <GetChangeResponse xmlns="https://route53.amazonaws.com/doc/2013-04-01/"><ChangeInfo><Id>/change/C01082082OE1Y7PESDEQA</Id><Status>INSYNC</Status><SubmittedAt>2024-06-29T07:08:20.170Z</SubmittedAt><Comment>Managed by Terraform</Comment></ChangeInfo></GetChangeResponse>
+   http.status_code=200 http.duration=156 http.response_content_length=291 tf_provider_addr=registry.terraform.io/hashicorp/aws @caller=github.com/hashicorp/aws-sdk-go-base/v2/awsv1shim/v2@v2.0.0-beta.26/logger.go:138 @module=aws timestamp=2024-06-29T01:09:00.237-0600
+2024-06-29T01:09:00.237-0600 [DEBUG] provider.terraform-provider-aws_v4.67.0_x5: HTTP Request Sent: http.flavor=1.1 http.method=GET http.request.body="" http.request.header.authorization="AWS4-HMAC-SHA256 Credential=AKIA************XUWE/20240629/us-east-1/route53/aws4_request, SignedHeaders=host;x-amz-date, Signature=*****" http.request.header.x_amz_date=20240629T070900Z http.url=https://route53.amazonaws.com/2013-04-01/hostedzone/Z07774303G2AYPCGKGZSX @module=aws aws.sdk=aws-sdk-go tf_req_id=99cbdc2f-1c94-ba72-1615-7b0ea4db1b30 http.user_agent="APN/1.0 HashiCorp/1.0 Terraform/1.8.5 (+https://www.terraform.io) terraform-provider-aws/4.67.0 (+https://registry.terraform.io/providers/hashicorp/aws) aws-sdk-go/1.44.261 (go1.19.8; darwin; arm64)" tf_mux_provider="*schema.GRPCProviderServer" tf_rpc=ApplyResourceChange aws.service="Route 53" tf_provider_addr=registry.terraform.io/hashicorp/aws @caller=github.com/hashicorp/aws-sdk-go-base/v2/awsv1shim/v2@v2.0.0-beta.26/logger.go:90 aws.operation=GetHostedZone aws.region=us-east-1 net.peer.name=route53.amazonaws.com tf_resource_type=aws_route53_record timestamp=2024-06-29T01:09:00.237-0600
+2024-06-29T01:09:00.417-0600 [DEBUG] provider.terraform-provider-aws_v4.67.0_x5: HTTP Response Received: tf_provider_addr=registry.terraform.io/hashicorp/aws @module=aws aws.region=us-east-1 aws.service="Route 53" http.response.header.date="Sat, 29 Jun 2024 07:09:00 GMT" http.status_code=200 tf_rpc=ApplyResourceChange aws.operation=GetHostedZone aws.sdk=aws-sdk-go http.response.header.content_type=text/xml http.response_content_length=729 tf_mux_provider="*schema.GRPCProviderServer"
+  http.response.body=
+  | <?xml version="1.0"?>
+  | <GetHostedZoneResponse xmlns="https://route53.amazonaws.com/doc/2013-04-01/"><HostedZone><Id>/hostedzone/Z07774303G2AYPCGKGZSX</Id><Name>kubixcorp.com.</Name><CallerReference>02463149-c197-4044-b0a1-ddc2b87f2a96</CallerReference><Config><Comment></Comment><PrivateZone>false</PrivateZone></Config><ResourceRecordSetCount>31</ResourceRecordSetCount></HostedZone><DelegationSet><NameServers><NameServer>ns-510.awsdns-63.com</NameServer><NameServer>ns-1430.awsdns-50.org</NameServer><NameServer>ns-647.awsdns-16.net</NameServer><NameServer>ns-2034.awsdns-62.co.uk</NameServer></NameServers></DelegationSet><HostedZoneDeletionProtectionEnabled>false</HostedZoneDeletionProtectionEnabled></GetHostedZoneResponse>
+   http.response.header.x_amzn_requestid=1695fc94-84f9-4f1b-97ae-afd84502cdd9 tf_resource_type=aws_route53_record @caller=github.com/hashicorp/aws-sdk-go-base/v2/awsv1shim/v2@v2.0.0-beta.26/logger.go:138 http.duration=178 tf_req_id=99cbdc2f-1c94-ba72-1615-7b0ea4db1b30 timestamp=2024-06-29T01:09:00.416-0600
+2024-06-29T01:09:00.417-0600 [DEBUG] provider.terraform-provider-aws_v4.67.0_x5: HTTP Request Sent: tf_resource_type=aws_route53_record tf_rpc=ApplyResourceChange aws.region=us-east-1 aws.sdk=aws-sdk-go @module=aws aws.service="Route 53" http.request.header.authorization="AWS4-HMAC-SHA256 Credential=AKIA************XUWE/20240629/us-east-1/route53/aws4_request, SignedHeaders=host;x-amz-date, Signature=*****" http.request.header.x_amz_date=20240629T070900Z http.url="https://route53.amazonaws.com/2013-04-01/hostedzone/Z07774303G2AYPCGKGZSX/rrset?maxitems=1&name=5.isolated-oregon.kubixcorp.com.&type=A" @caller=github.com/hashicorp/aws-sdk-go-base/v2/awsv1shim/v2@v2.0.0-beta.26/logger.go:90 tf_mux_provider="*schema.GRPCProviderServer" http.method=GET http.request.body="" http.flavor=1.1 http.user_agent="APN/1.0 HashiCorp/1.0 Terraform/1.8.5 (+https://www.terraform.io) terraform-provider-aws/4.67.0 (+https://registry.terraform.io/providers/hashicorp/aws) aws-sdk-go/1.44.261 (go1.19.8; darwin; arm64)" net.peer.name=route53.amazonaws.com tf_provider_addr=registry.terraform.io/hashicorp/aws tf_req_id=99cbdc2f-1c94-ba72-1615-7b0ea4db1b30 aws.operation=ListResourceRecordSets timestamp=2024-06-29T01:09:00.416-0600
+2024-06-29T01:09:00.565-0600 [DEBUG] provider.terraform-provider-aws_v4.67.0_x5: HTTP Response Received: aws.operation=ListResourceRecordSets @module=aws http.response.header.date="Sat, 29 Jun 2024 07:09:00 GMT" tf_provider_addr=registry.terraform.io/hashicorp/aws tf_rpc=ApplyResourceChange aws.service="Route 53" http.duration=148
+  http.response.body=
+  | <?xml version="1.0"?>
+  | <ListResourceRecordSetsResponse xmlns="https://route53.amazonaws.com/doc/2013-04-01/"><ResourceRecordSets><ResourceRecordSet><Name>5.isolated-oregon.kubixcorp.com.</Name><Type>A</Type><AliasTarget><HostedZoneId>Z35SXDOTRQ7X7K</HostedZoneId><DNSName>alb-virginia-2107265340.us-east-1.elb.amazonaws.com.</DNSName><EvaluateTargetHealth>true</EvaluateTargetHealth></AliasTarget></ResourceRecordSet></ResourceRecordSets><IsTruncated>true</IsTruncated><NextRecordName>6.isolated-oregon.kubixcorp.com.</NextRecordName><NextRecordType>A</NextRecordType><MaxItems>1</MaxItems></ListResourceRecordSetsResponse>
+   http.response.header.x_amzn_requestid=b6eaf92c-cdd2-4ec6-892d-56cae7be35fb tf_req_id=99cbdc2f-1c94-ba72-1615-7b0ea4db1b30 tf_resource_type=aws_route53_record @caller=github.com/hashicorp/aws-sdk-go-base/v2/awsv1shim/v2@v2.0.0-beta.26/logger.go:138 aws.region=us-east-1 aws.sdk=aws-sdk-go http.response.header.content_type=text/xml http.response_content_length=622 http.status_code=200 tf_mux_provider="*schema.GRPCProviderServer" timestamp=2024-06-29T01:09:00.565-0600
+2024-06-29T01:09:00.572-0600 [WARN]  Provider "provider[\"registry.terraform.io/hashicorp/aws\"].route53" produced an unexpected new value for aws_route53_record.tasks_dns_oregon[4], but we are tolerating it because it is using the legacy plugin SDK.
+    The following problems may be the cause of any confusing errors from downstream operations:
+      - .health_check_id: was null, but now cty.StringVal("")
+      - .set_identifier: was null, but now cty.StringVal("")
+      - .multivalue_answer_routing_policy: was null, but now cty.False
+      - .ttl: was null, but now cty.NumberIntVal(0)
+[0m[1maws_route53_record.tasks_dns_oregon[4]: Creation complete after 41s [id=Z07774303G2AYPCGKGZSX_5.isolated-oregon.kubixcorp.com_A][0m
+2024-06-29T01:09:00.593-0600 [DEBUG] State storage *statemgr.Filesystem declined to persist a state snapshot
+2024-06-29T01:09:00.595-0600 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2024-06-29T01:09:00.615-0600 [DEBUG] provider: plugin process exited: path=.terraform/providers/registry.terraform.io/hashicorp/aws/4.67.0/darwin_arm64/terraform-provider-aws_v4.67.0_x5 pid=90780
+2024-06-29T01:09:00.619-0600 [DEBUG] provider: plugin exited
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-2/2d4ea7c3010d1f05/edd4b24eb81bec48' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: 70c1bd51-0fe5-4e9f-9d5a-14fd14181e80[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[7],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-1/8a1d0ce827159655/e75c388da52759a1' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: 3a187eee-f58d-4861-b83a-8fe5e2d25c3e[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[14],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-1/8a1d0ce827159655/e75c388da52759a1' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: 3a7ce010-fb0b-4ce1-9aa5-ac8321e99238[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[12],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-1/8a1d0ce827159655/e75c388da52759a1' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: 11c3762c-4e43-4fe8-a055-323bd21fe210[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[6],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-2/2d4ea7c3010d1f05/edd4b24eb81bec48' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: 68910dce-4d8a-479c-9916-cc6da5840d25[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[11],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-1/8a1d0ce827159655/e75c388da52759a1' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: 217ff92f-9144-4c8e-847a-98c982d0b6b4[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[4],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-2/2d4ea7c3010d1f05/edd4b24eb81bec48' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: 9d1efe9e-849c-41ed-a0bc-9e00de62dbe1[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[9],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-2/2d4ea7c3010d1f05/edd4b24eb81bec48' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: de2da833-7e90-449a-b15f-dbf5b8e0a50b[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[5],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-2/2d4ea7c3010d1f05/edd4b24eb81bec48' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: 011ceaa8-4987-4558-a9fe-bfdcb3403b19[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[13],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-1/8a1d0ce827159655/e75c388da52759a1' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: b3cf0e7f-2232-483f-97e1-38759b144e5c[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[0],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-1/8a1d0ce827159655/e75c388da52759a1' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: d9696682-31e8-4aa5-80de-07d36ca11249[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[10],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-2/2d4ea7c3010d1f05/edd4b24eb81bec48' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: 29e00a95-8332-461e-83b5-5e02494fcb19[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[1],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-1/8a1d0ce827159655/e75c388da52759a1' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: b71191a3-79c6-436e-b4c7-f289be336751[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[2],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-1/8a1d0ce827159655/e75c388da52759a1' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: d53af617-6fa2-4989-b7d3-84c1fce2afb1[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[8],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-2/2d4ea7c3010d1f05/edd4b24eb81bec48' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: cd5af96e-8d6b-45e2-893c-245bec1d0da8[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[3],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating ELBv2 Listener Rule: ValidationError: 'arn:aws:elasticloadbalancing:us-east-1:993407081893:listener/app/prod-app-lb-virginia-2/2d4ea7c3010d1f05/edd4b24eb81bec48' is not a valid listener ARN
+[31m│[0m [0m	status code: 400, request id: ec98d835-7a87-4a7f-b44d-5c017a0d65c2[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with aws_lb_listener_rule.service_rules[15],
+[31m│[0m [0m  on main.tf line 731, in resource "aws_lb_listener_rule" "service_rules":
+[31m│[0m [0m 731: resource "aws_lb_listener_rule" "service_rules" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+2024-06-29T01:09:00.731-0600 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2024-06-29T01:09:00.739-0600 [DEBUG] provider: plugin process exited: path=.terraform/providers/registry.terraform.io/hashicorp/aws/4.67.0/darwin_arm64/terraform-provider-aws_v4.67.0_x5 pid=90782
+2024-06-29T01:09:00.745-0600 [DEBUG] provider: plugin exited

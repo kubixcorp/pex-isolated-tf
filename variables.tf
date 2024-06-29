@@ -88,9 +88,14 @@ variable "allowed_ips" {
   description = "My IP address"
   type        = string
 }*/
-variable "environment" {
+variable "environment_dev" {
   description = "Deployment environment (prod or dev)"
-  default     = "dev"
+  default     = "Dev"
+}
+
+variable "environment_prod" {
+  description = "Deployment environment (prod or dev)"
+  default     = "Prod"
 }
 
 /*variable "vpc_virginia_private_subnet_ids" {
