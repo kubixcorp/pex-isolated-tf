@@ -551,7 +551,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
 /* ECS Fargate */
 resource "aws_ecs_cluster" "ecs_cluster_virginia" {
   provider = aws.virginia
-  name = "${var.environment_dev}-Prod-Cluster-Puntoxpress"
+  name     = "${var.environment_dev}-Prod-Cluster-Puntoxpress"
 }
 
 resource "aws_wafv2_web_acl" "web_acl_ecs_virginia" {
@@ -594,20 +594,13 @@ resource "aws_wafv2_web_acl" "web_acl_ecs_virginia" {
 }
 
 resource "aws_lb" "app_lb_virginia" {
-  provider = aws.virginia
+  provider           = aws.virginia
   name               = "${var.environment_dev}-ALB-Puntoxpress"
   internal           = false
   load_balancer_type = "application"
   security_groups = [aws_security_group.lb_sg_virginia.id]
   subnets            = module.vpc_virginia.public_subnets
 
-}
-
-resource "aws_wafv2_web_acl_association" "web_acl_association_ecs_virginia" {
-  provider     = aws.virginia
-  resource_arn = module.alb_virginia.alb_arn
-  web_acl_arn  = aws_wafv2_web_acl.web_acl_ecs_virginia.arn
-  depends_on = [module.alb_virginia, aws_wafv2_web_acl.web_acl_ecs_virginia]
 }
 
 resource "aws_lb_listener" "https_listener_virginia" {
@@ -628,6 +621,15 @@ resource "aws_lb_listener" "https_listener_virginia" {
   depends_on = [aws_lb.app_lb_virginia, aws_lb_target_group.app_tg_virginia]
 }
 
+resource "aws_wafv2_web_acl_association" "web_acl_association_ecs_virginia" {
+  provider     = aws.virginia
+  resource_arn = aws_lb.app_lb_virginia.arn
+  web_acl_arn  = aws_wafv2_web_acl.web_acl_ecs_virginia.arn
+  depends_on = [aws_lb.app_lb_virginia, aws_wafv2_web_acl.web_acl_ecs_virginia]
+}
+
+
+
 resource "aws_lb_target_group" "app_tg_virginia" {
   provider    = aws.virginia
   count       = 8
@@ -644,6 +646,9 @@ resource "aws_lb_target_group" "app_tg_virginia" {
     timeout             = "3"
     path                = "/"
     unhealthy_threshold = "2"
+  }
+  lifecycle {
+    create_before_destroy = true
   }
   depends_on = [aws_lb.app_lb_virginia]
 }
@@ -703,10 +708,10 @@ resource "aws_ecs_task_definition" "task_def_virginia" {
 
 resource "aws_lb_listener_rule" "ecs_rule_virginia" {
   provider     = aws.virginia
-  count        = 8
-  tags         = { Name = "ecs_rule_virginia_${count.index + 1}" }
-  listener_arn = module.alb_virginia.alb_listener_https_arn
-  priority     = 10 + count.index
+  count = 8
+  // tags         = { Name = "ecs_rule_virginia_${count.index + 1}" }
+  listener_arn = aws_lb_listener.https_listener_virginia.arn
+  priority     = 100 + count.index
 
   action {
     type             = "forward"
@@ -718,6 +723,12 @@ resource "aws_lb_listener_rule" "ecs_rule_virginia" {
       values = ["srv${count.index + 1}.isolated-virginia.kubixcorp.com"]
     }
   }
+
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+
+  depends_on = [aws_lb_listener.https_listener_virginia, aws_lb_target_group.app_tg_virginia]
 }
 
 resource "aws_ecs_service" "ecs_service_virginia" {
@@ -730,7 +741,7 @@ resource "aws_ecs_service" "ecs_service_virginia" {
   launch_type     = "FARGATE"
   network_configuration {
     subnets          = module.vpc_virginia.public_subnets
-    security_groups  = [aws_security_group.lb_sg_virginia.id]
+    security_groups = [aws_security_group.lb_sg_virginia.id]
     assign_public_ip = true
   }
   load_balancer {
@@ -749,8 +760,9 @@ resource "aws_ecs_service" "ecs_service_virginia" {
 
 resource "aws_route53_record" "tasks_dns_ecs_virginia" {
   provider = aws.route53
+  count    = 8
   zone_id  = "Z07774303G2AYPCGKGZSX"
-  name     = "srv.isolated-virginia.kubixcorp.com"
+  name     = "srv${count.index + 1}.isolated-virginia.kubixcorp.com"
   type     = "A"
 
   alias {
