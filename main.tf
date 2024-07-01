@@ -2270,6 +2270,8 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
 
 /* ECS Fargate */
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_ecr_repository" "nginx_virginia" {
   provider             = aws.virginia
   name                 = "nginx"
@@ -2292,27 +2294,20 @@ resource "null_resource" "ecr_push_image" {
   depends_on = [aws_ecr_repository.nginx_virginia]
 }
 
-resource "aws_ecr_repository" "nginx_oregon" {
-  provider             = aws.oregon
-  name                 = "nginx"
-  image_tag_mutability = "MUTABLE"
-  force_delete         = true
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-}
-
 resource "aws_ecr_replication_configuration" "ecr_replication" {
   provider = aws.virginia
   replication_configuration {
     rule {
       destination {
-        region      = data.aws_region.oregon.name
-        registry_id = aws_ecr_repository.nginx_oregon.registry_id
+        region = data.aws_region.oregon.name
+        registry_id = data.aws_caller_identity.current.account_id
       }
+/*      repository_filter {
+        filter      = "*"
+        filter_type = "PREFIX_MATCH"
+      }*/
     }
   }
-  depends_on = [aws_ecr_repository.nginx_virginia, aws_ecr_repository.nginx_oregon]
 }
 
 resource "aws_ecs_cluster" "ecs_cluster_virginia" {
