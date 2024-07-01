@@ -2270,6 +2270,39 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
 
 /* ECS Fargate */
 
+locals {
+  services = [
+    {
+      name = "administrator-api"
+      path = "/admin/api/v1/*"
+    },
+    {
+      name = "terminal-api"
+      path = "/terminal/api/v1/*"
+    },
+    {
+      name = "auth-server"
+      path = "/security-auth/*"
+    },
+    {
+      name = "cashflow-gateway"
+      path = "/cashout/api/v1*"
+    },
+    {
+      name = "cashier-gateway"
+      path = "/cashier/api/v1/*"
+    },
+    {
+      name = "payment-gateway"
+      path = "/payment/api/v1/*"
+    },
+    {
+      name = "topup-gateway"
+      path = "/topup/api/v1/*"
+    }
+  ]
+}
+
 data "aws_caller_identity" "current" {}
 
 resource "aws_ecr_repository" "nginx_virginia" {
@@ -2299,20 +2332,20 @@ resource "aws_ecr_replication_configuration" "ecr_replication" {
   replication_configuration {
     rule {
       destination {
-        region = data.aws_region.oregon.name
+        region      = data.aws_region.oregon.name
         registry_id = data.aws_caller_identity.current.account_id
       }
-/*      repository_filter {
-        filter      = "*"
-        filter_type = "PREFIX_MATCH"
-      }*/
+      /*      repository_filter {
+              filter      = "*"
+              filter_type = "PREFIX_MATCH"
+            }*/
     }
   }
 }
 
 resource "aws_ecs_cluster" "ecs_cluster_virginia" {
   provider = aws.virginia
-  name     = "${var.environment_dev}-Prod-Cluster-Puntoxpress"
+  name     = "${var.environment_dev}-Cluster-Puntoxpress"
 }
 
 resource "aws_wafv2_web_acl" "ecs_web_acl_virginia" {
@@ -2391,8 +2424,8 @@ resource "aws_wafv2_web_acl_association" "ecs_web_acl_association_virginia" {
 
 resource "aws_lb_target_group" "ecs_app_tg_virginia" {
   provider    = aws.virginia
-  count       = 8
-  name        = "${var.environment_dev}-TGroup-Puntoxpress-${count.index + 1}"
+  count = length(local.services)
+  name        = "${lower(var.environment_dev)}-service-${local.services[count.index].name}"
   port        = 80
   protocol    = "HTTP"
   vpc_id      = module.vpc_virginia.vpc_id
@@ -2439,10 +2472,16 @@ resource "aws_security_group" "ecs_lb_sg_virginia" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+  provider = aws.virginia
+  name     = "/ecs/${lower(var.environment_dev)}-logs"
+  retention_in_days = 1096
+}
+
 resource "aws_ecs_task_definition" "ecs_task_def_virginia" {
   provider           = aws.virginia
-  count              = 8
-  family             = "${var.environment_dev}-task-def-${count.index + 1}"
+  count = length(local.services)
+  family             = "${lower(var.environment_dev)}-task-def-${local.services[count.index].name}"
   network_mode       = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                = "256"
@@ -2455,7 +2494,7 @@ resource "aws_ecs_task_definition" "ecs_task_def_virginia" {
   }
   container_definitions = jsonencode([
     {
-      name  = "app"
+      name  = "${lower(var.environment_dev)}-${local.services[count.index].name}"
       image = "${aws_ecr_repository.nginx_virginia.repository_url}:1.27.0-alpine-slim"
       portMappings = [
         {
@@ -2470,9 +2509,18 @@ resource "aws_ecs_task_definition" "ecs_task_def_virginia" {
           value = timestamp()
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.ecs_logs.name
+          awslogs-region        = var.vpc_virginia_region
+          awslogs-stream-prefix = local.services[count.index].name
+        }
+      }
     }
   ])
   depends_on = [
+    aws_cloudwatch_log_group.ecs_logs,
     time_sleep.wait_15_seconds, aws_iam_role.ecs_task_execution_role,
     aws_iam_role.ecs_task_role,
     aws_iam_role_policy_attachment.ecs_task_execution_role_policy
@@ -2481,8 +2529,7 @@ resource "aws_ecs_task_definition" "ecs_task_def_virginia" {
 
 resource "aws_lb_listener_rule" "ecs_rule_virginia" {
   provider     = aws.virginia
-  count        = 8
-  tags = { Name = "ecs_rule_virginia_${count.index + 1}" }
+  count = length(local.services)
   listener_arn = aws_lb_listener.ecs_https_listener_virginia.arn
   priority     = 100 + count.index
 
@@ -2492,18 +2539,20 @@ resource "aws_lb_listener_rule" "ecs_rule_virginia" {
   }
 
   condition {
-    host_header {
-      values = ["srv${count.index + 1}.isolated-virginia.kubixcorp.com"]
+    path_pattern {
+      values = [local.services[count.index].path]
     }
   }
+
+  tags = { Name = "${lower(var.environment_dev)}-ecs_rule-${local.services[count.index].name}" }
 
   depends_on = [aws_lb_listener.ecs_https_listener_virginia, aws_lb_target_group.ecs_app_tg_virginia]
 }
 
 resource "aws_ecs_service" "ecs_service_virginia" {
   provider        = aws.virginia
-  count           = 8
-  name            = "${var.environment_dev}-ecs-service-${count.index + 1}"
+  count = length(local.services)
+  name            = "${lower(var.environment_dev)}-${local.services[count.index].name}"
   cluster         = aws_ecs_cluster.ecs_cluster_virginia.id
   task_definition = aws_ecs_task_definition.ecs_task_def_virginia[count.index].arn
   desired_count   = 1
@@ -2515,7 +2564,7 @@ resource "aws_ecs_service" "ecs_service_virginia" {
   }
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_app_tg_virginia[count.index].arn
-    container_name   = "app"
+    container_name   = "${lower(var.environment_dev)}-${local.services[count.index].name}"
     container_port   = 80
   }
   depends_on = [
@@ -2529,11 +2578,10 @@ resource "aws_ecs_service" "ecs_service_virginia" {
 
 resource "aws_route53_record" "ecs_tasks_dns_virginia" {
   provider = aws.route53
-  count    = 8
-  zone_id  = "Z07774303G2AYPCGKGZSX"
-  name     = "srv${count.index + 1}.isolated-virginia.kubixcorp.com"
-  type     = "A"
-
+  //count = length(local.services)
+  name    = "${lower(var.environment_dev)}-srv.isolated-virginia.kubixcorp.com"
+  zone_id = "Z07774303G2AYPCGKGZSX"
+  type    = "A"
   alias {
     name                   = aws_lb.ecs_app_lb_virginia.dns_name
     zone_id                = aws_lb.ecs_app_lb_virginia.zone_id
